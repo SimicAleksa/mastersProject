@@ -1,5 +1,7 @@
 from mastersProject.enums_consts import DIRECTIONS, display_help
 from mastersProject.interpreter import parse_dsl
+from mastersProject.game_generator import generate_game_from_prompt
+
 
 global game_world
 
@@ -69,4 +71,9 @@ def run_main():
 
 
 if __name__ == "__main__":
+    # prompt = "Create a fantasy adventure game where the hero must save a kingdom from an  stone ancient dragon that uses lightning."
+    # generated_game_path = generate_game_from_prompt(prompt)
+    # print(generated_game_path)
+
+
     run_main()

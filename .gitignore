@@ -1,3 +1,4 @@
+mastersProject/.env
 .env
 
 # Byte-compiled / optimized / DLL files
@@ -122,7 +123,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
+mastersProject/.env
 .venv
 env/
 venv/

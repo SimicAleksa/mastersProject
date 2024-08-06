@@ -1,0 +1,134 @@
+region castle_entrance {
+    portrayal "The grand entrance of the ancient castle where the kingdom's royal family resides."
+    contains sword, a_of_bravery
+    ::
+    N -> grand_hall
+    ::
+}
+
+region grand_hall {
+    portrayal "A vast hall with tall ceilings and majestic banners hanging from the walls."
+    contains h_potion, map
+    ::
+    N -> throne_room,
+    S -> castle_entrance
+    ::
+}
+
+region throne_room {
+    portrayal "The main chamber of the castle where the king holds court."
+    contains dragon_slaying_scroll
+    ::
+    N -> dragon_lair,
+    S -> grand_hall
+    ::
+    requirements a_of_bravery
+}
+
+region dragon_lair {
+    portrayal "The dark lair of the ancient stone dragon, crackling with electricity."
+    contains battle_axe
+    ::
+    N -> victory_chamber,
+    S -> throne_room
+    ::
+    environmental_dmg damage 25
+}
+
+region victory_chamber {
+    portrayal "A chamber filled with treasures. You have defeated the dragon!"
+    ::
+    S -> dragon_lair
+    ::
+}
+
+item h_potion {
+    portrayal "A magical potion that restores health."
+    activation heal 50
+    isStatic False
+}
+
+item map {
+    portrayal "A map of the kingdom with marked locations."
+    isStatic True
+}
+
+item dragon_slaying_scroll {
+    portrayal "A scroll containing the secrets to defeating the ancient dragon."
+    isStatic False
+}
+
+item sword {
+    portrayal "A shining sword, perfect for slaying dragons."
+    isStatic False
+}
+
+item a_of_bravery {
+    portrayal "A sturdy armor that grants courage to its wearer."
+    isStatic False
+}
+
+player hero {
+    currentExperience 0
+    neededExperienceForLevelUp 100
+    levelScalingPercentage 100
+    level 1
+    portrayal "You are the kingdom's brave hero, determined to save the realm."
+    position castle_entrance
+    inventory {
+        h_potion, map
+    }
+    strength 15
+    intelligence 5
+    health 100
+    damage 15
+    defence 10
+
+    canEquip {
+        sword, a_of_bravery
+    }
+}
+
+enemy ancient_stone_dragon {
+    portrayal "A massive stone dragon that shoots lightning from its mouth."
+    position dragon_lair
+    health 11
+    xp 100
+    attacks {
+        attack lightning_breath {
+            healthDamage 40
+            healthDamageVariance 0.3
+            frequency 0.5
+        }
+        attack tail_slam {
+            healthDamage 60
+            healthDamageVariance 0.2
+            frequency 0.5
+        }
+    }
+    healing {
+        chance 0.3
+        amount 20
+        amountVariance 0.1
+    }
+}
+
+weapon battle_axe {
+    portrayal "A heavy battle axe, effective against dragons."
+    type axe
+    healthDamage 50
+    modifiers {
+        modifier {
+            modifies damage
+            coefficients 1.5
+        }
+    }
+}
+
+settings {
+    dropOtherWeapons True
+    additionalTurnAfterUse False
+}
+
+start_position castle_entrance
+final_position victory_chamber

@@ -208,7 +208,12 @@ Keyword:
     'portrayal' | 'position' | 'heal' | 'health' | 'contains' | 'inventory' | 'isStatic' |
     'requirements' | 'damage' | 'environmental_dmg' | 'xp' | 'vigor' | 'endurance' | 'strength' | 'currentExperience' |
     'neededExperienceForLevelUp' | 'dropsWeapon' | 'level' |
-    'region' | 'item' | 'player' | 'enemy' | 'weapon'
+    'region' | 'item' | 'player' | 'enemy' | 'weapon' | 'use' | 'restoreMana' | 'activation' | 'current_max_health' |
+    'current_max_mana' | 'defence' | 'mana_damage' | 'mana_defence' | 'coefficients' | 'modifies' | 'modifier {' |
+    'modifiers' | 'requiredLevel' | 'manaDefense' | 'defense' | 'type' | 'armor' | 'healthDamage' | 'manaDamage' | 'healthCost' |
+    'manaCost' | 'attack' | 'healthDamageVariance' | 'manaDamageVariance' | 'frequency' | 'levelScalingPercentage' |
+    'intelligence' | 'mana' | 'manaDefence' | 'canEquip' | 'settings' | 'dropOtherWeapons' | 'dropOtherArmors' | 'additionalTurnAfterUse' |
+    'drops' | 'attacks' | 'healing' | 'chance' | 'amount' | 'amountVariance'
 ;
 
 GWID:

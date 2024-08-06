@@ -1,0 +1,224 @@
+GameWorld:
+    regions += Region
+    items += Item
+    player = Player
+    enemies += Enemy
+    weapons += Weapon
+    armors *= Armor
+    settings += GeneralSettings
+    'start_position' start_position = [Region]
+    'final_position' final_position = [Region]
+;
+
+GeneralSettings:
+    'settings' '{'
+        (
+            ('dropOtherWeapons' dropOtherWeapons = BOOL)?
+            ('dropOtherArmors' dropOtherArmors = BOOL)?
+            'additionalTurnAfterUse' additionalTurnAfterUse = BOOL?
+        )#
+    '}'
+;
+
+Region:
+    'region' name = GWID '{'
+        (
+            'portrayal' portrayal = STRING
+            ('contains' contains *= [Containable][','])?
+            '::'
+            connections *= Connection[',']
+            '::'
+            ('requirements' requirements += Requirement[','])?
+            ('environmental_dmg' environmental_dmg = EnvironmentalDamage)?
+        )#
+    '}'
+;
+
+Enemy:
+    'enemy' name = GWID '{'
+        (
+            'portrayal' portrayal = STRING
+            'position' position = [Region]
+            'health' health = INT
+            ('mana' mana = INT)?
+            ('drops' '{' inventory *= [Containable][','] '}')?
+            'attacks' '{' attackTypes += AttackType '}'
+            'xp' xp = INT
+            ('healing' '{'
+                (
+                    'chance' healingChance = FLOAT
+                    'amount' healingAmount = INT
+                    'amountVariance' healingAmountVariance = FLOAT
+                )#
+            '}')?
+        )#
+    '}'
+;
+
+AttackType:
+    'attack' name = GWID '{'
+        (
+            'healthDamage' healthDamage = INT
+            'healthDamageVariance' healthDamageVariance = FLOAT
+            ('manaDamage' manaDamage = INT)?
+            ('manaDamageVariance' manaDamageVariance = FLOAT)?
+            ('healthCost' healthCost = INT)?
+            ('manaCost' manaCost = INT)?
+            'frequency' frequency = FLOAT
+        )#
+    '}'
+;
+
+Requirement:
+    item = GWID
+;
+
+Player:
+    'player' name = GWID '{'
+        (
+            'portrayal' portrayal = STRING
+            'currentExperience' currentExperience = INT
+            'neededExperienceForLevelUp' neededExperienceForLevelUp = INT
+            'levelScalingPercentage' levelScalingPercentage = INT
+            'level' level = INT
+            'position' position = [Region]
+            'inventory' '{' inventory *= [Containable][','] '}'
+            ('vigor' vigor = INT)?
+            ('endurance' endurance = INT)?
+            ('strength' strength = INT)?
+            ('intelligence' intelligence = INT)?
+
+            'health' health = INT
+            ('mana' mana = INT)?
+            'damage' damage = INT
+            'defence' defence = INT
+            ('manaDamage' manaDamage = INT)?
+            ('manaDefence' manaDefence = INT)?
+            'canEquip' '{' canEquip *= GWID[','] '}'
+        )#
+    '}'
+;
+
+Weapon:
+    'weapon' name = GWID '{'
+        (
+            'portrayal' portrayal = STRING
+            'type' type = GWID
+            'healthDamage' healthDamage = INT
+            ('manaDamage' manaDamage = INT)?
+            ('healthCost' healthCost = INT)?
+            ('manaCost' manaCost = INT)?
+            ('requiredLevel' requiredLevel = INT)?
+            ('modifiers' '{' modifiers *= Modifier '}')?
+        )#
+    '}'
+;
+
+Armor:
+    'armor' name = GWID '{'
+        (
+            'portrayal' portrayal = STRING
+            'type' type = GWID
+            'defense' defense = INT
+            ('manaDefense' manaDefense = INT)?
+            ('requiredLevel' requiredLevel = INT)?
+            ('modifiers' '{' modifiers *= Modifier '}')?
+        )#
+    '}'
+;
+
+Modifier:
+    'modifier {'
+        'modifies' modifiableAttribute = Modifiable
+        'coefficients' coefficients += FLOAT[',']
+    '}'
+;
+
+Modifiable:
+    'current_max_health' | 'current_max_mana' | 'damage' | 'defence' | 'mana_damage' | 'mana_defence'
+;
+
+
+Item:
+    'item' name = GWID '{'
+        (
+            activations *= ActivationProperties
+            'portrayal' portrayal = STRING
+            ('contains' contains *= [Containable][','])?
+            'isStatic' isStatic = BOOL
+        )#
+    '}'
+;
+
+
+Connection:
+    direction = Direction '->' target = GWID
+;
+
+Containable:
+    Item | Weapon | Armor
+;
+
+ActivationProperties:
+    'activation' action = ActivationAction
+;
+
+ActivationAction:
+    RestoreHealthAction | RestoreManaAction
+;
+
+RestoreHealthAction:
+    'heal' amount = INT
+;
+
+RestoreManaAction:
+    'restoreMana' amount = INT
+;
+
+EnvironmentalDamage:
+    'damage' amount = INT
+;
+
+MovementProperties:
+    MoveCommand | OpenCommand | TakeCommand | DropCommand | UseCommand
+;
+
+MoveCommand:
+    'move' direction = Direction
+;
+
+OpenCommand:
+    'open' object = GWID
+;
+
+TakeCommand:
+    'take' object = GWID
+;
+
+DropCommand:
+    'drop' object = GWID
+;
+
+UseCommand:
+    'use' object = GWID
+;
+
+Keyword:
+    'start_position' | 'final_position' | 'drop' | 'take' | 'open' | 'move' | 'N' | 'S' | 'E' | 'W' |
+    'portrayal' | 'position' | 'heal' | 'health' | 'contains' | 'inventory' | 'isStatic' |
+    'requirements' | 'damage' | 'environmental_dmg' | 'xp' | 'vigor' | 'endurance' | 'strength' | 'currentExperience' |
+    'neededExperienceForLevelUp' | 'dropsWeapon' | 'level' |
+    'region' | 'item' | 'player' | 'enemy' | 'weapon'
+;
+
+GWID:
+    !Keyword ID
+;
+
+Direction:
+    'N' | 'S' | 'E' | 'W'
+;
+
+Comment:
+    /\/\*(.|\n)*?\*\//
+;

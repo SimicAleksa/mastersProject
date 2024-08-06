@@ -1,0 +1,171 @@
+region entryway {
+    portrayal "the entryway of a haunted house"
+    contains key, flashlight, chest, magic_wand, shield
+    ::
+    N -> hallway
+    ::
+}
+
+region hallway {
+    portrayal "a dimly lit hallway"
+    contains chest, katana
+    ::
+    N -> kitchen,
+    S -> entryway
+    ::
+    environmental_dmg damage 33
+}
+
+region kitchen {
+    portrayal "the spooky kitchen"
+    ::
+    N -> mamas_basement,
+    S -> hallway
+    ::
+    requirements key
+}
+
+region mamas_basement{
+    portrayal "the basement! Mamas favorite!"
+    ::
+    N -> backyard,
+    S -> kitchen
+    ::
+}
+
+
+region backyard {
+    portrayal "the backyard! Congratulations, you won!"
+    ::
+    S -> mamas_basement
+    ::
+}
+
+
+item chest {
+    portrayal "A wooden chest on the ground."
+    contains twix, mars
+    isStatic True
+}
+
+item twix {
+    portrayal "A twix bar. Caramel, shortbread and chocolate delightfully restoring health."
+    activation heal 50
+    isStatic False
+}
+
+item mars {
+    portrayal "A mars bar. Caramel and chocolate delightfully restoring health."
+    activation heal 700
+    isStatic False
+}
+
+item key {
+    portrayal "A mysterious key lies on the ground."
+    isStatic False
+}
+
+item flashlight {
+    portrayal "A flashlight lies on the ground."
+    activation heal 10
+    isStatic False
+}
+
+player adventurer {
+    currentExperience 0
+    neededExperienceForLevelUp 20
+    levelScalingPercentage 50000
+    level 1
+    portrayal "You are an intrepid adventurer."
+    position entryway
+    inventory {
+        mars
+    }
+    intelligence 5
+    vigor 10
+    strength 10
+    endurance 10
+
+    health 100
+    mana 100
+    damage 10
+    defence 5
+
+    canEquip {
+        sword,wood
+    }
+}
+
+enemy young_dragon {
+    portrayal "A young playful dragon looking for trouble."
+    position kitchen
+    drops {
+        twix,
+        mars,
+        katana,
+        shield
+    }
+    health 1000
+    mana 10
+    xp 50
+    attacks {
+        attack fire_attack {
+            healthDamage 30
+            healthDamageVariance 0.2
+            frequency 0.6
+        }
+        attack kick_attack {
+            healthDamage 40
+            healthDamageVariance 0.1
+            frequency 0.4
+        }
+    }
+    healing {
+        chance 0.5
+        amount 10
+        amountVariance 0.2
+    }
+}
+
+weapon katana {
+    portrayal "A very mighty sword"
+    type sword
+    healthDamage 10
+    modifiers {
+        modifier {
+            modifies current_max_health
+            coefficients 10,43
+        }
+        modifier {
+            modifies damage
+            coefficients 0.5,5,2
+        }
+        modifier {
+            modifies mana_defence
+            coefficients 25
+        }
+    }
+}
+
+weapon magic_wand {
+    portrayal "Mysterious magic wand"
+    type magic
+    requiredLevel 4
+    manaCost 10
+    healthDamage 5
+}
+
+armor shield {
+    portrayal "Ugly shield"
+    type wood
+    requiredLevel 1
+    defense 30
+}
+
+settings {
+    dropOtherWeapons True
+    additionalTurnAfterUse False
+}
+
+start_position entryway
+final_position backyard

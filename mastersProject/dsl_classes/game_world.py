@@ -24,7 +24,12 @@ class GameWorld:
         previous_region = None
 
         for i in range(num_regions):
-            # Generisati naziv i opis pomocu CHAT GPT-a
+            # Generisati naziv i opis pomocu CHAT GPT-a, a za ostale stvari (iteme) isto treba da bude ukljucen on nekako
+            # TODO takodje treba dodati i sledece stvati za svaku novokreiranu regiiju ->
+            # self.items = {} #generate_new_item postoji funkcija koja se moze pokrenuti
+            # self.requirements = [] # staviti da je neki random item iz prethodnih itema koji ne moze da se aktivira potreban znaci od 0 do npr 2 sa tim itemima predjasnje spomenutim
+            # self.environmental_dmg = None # moze da se stavi random od 0 do npr 35
+            # NAPOMENA!! oruzja se nalaze u itemima ili se dobijaju kao drop od neprijatelja!!!!!
             new_region_name = f"Region_{len(self.regions) + 1}"
             new_region_portrayal = f"A newly discovered area {new_region_name}."
             new_region = Region(new_region_name, new_region_portrayal)
@@ -70,6 +75,10 @@ class GameWorld:
     # ChatGPT API TODO kasnije
     def generate_new_item(self):
         # Generisati naziv i opis pomocu CHAT GPT-a
+        # TODO takodje treba dodati i sledece stvati za svaku novokreirani item ->
+        # self.contains = [] # hmmm ovo treba isto sa chatGPT-jem da on stavi neka oruzja ili armor unutar nekih itema
+        # self.activations = [] random od mogucih aktivacija jednu ili 0
+        # self.isStatic = is_static # opet random ali zavisi od price odnosno hajde ovako ako sadrzi nesto u sebi onda jeste static
         new_item_name = f"Item_{len(self.items) + 1}"
         new_item_portrayal = f"A mysterious object called {new_item_name}."
         new_item = Item(new_item_name, new_item_portrayal, is_static=False)

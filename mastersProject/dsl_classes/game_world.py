@@ -38,7 +38,7 @@ class GameWorld:
                     new_region.add_connection(self.opposite_dirs[direction], previous_region.name)
 
                 # Dodatne konekcije ka vec postojecim regijama
-                num_extra_connections = random.choice([0, 0, 0, 1, 1, 2])
+                num_extra_connections = random.choice([0, 0, 0, 0, 1, 1, 1, 2])
                 connected_regions = {previous_region}
 
                 for _ in range(num_extra_connections):

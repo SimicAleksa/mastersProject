@@ -20,26 +20,52 @@ class GameWorld:
         self.opposite_dirs = {"N": "S", "S": "N", "E": "W", "W": "E"}
         self.settings = None
 
-    # ChatGPT API
-    def generate_new_region(self):
-        # Generisati naziv i opis pomocu CHAT GPT-a
-        new_region_name = f"Region_{len(self.regions) + 1}"
-        new_region_portrayal = f"A newly discovered area {new_region_name}."
-        new_region = Region(new_region_name, new_region_portrayal)
+    def generate_new_regions(self, num_regions):
+        previous_region = None
 
-        if self.regions:
-            existing_region = None
-            for region in self.regions:
-                if region.name == self.final_position.name:
-                    existing_region = region
-            # Takodje obratiti paznju da se ne preklope putevi vec postojeci!!!!!
-            direction = random.choice(list(self.opposite_dirs.keys()))
-            existing_region.add_connection(direction, new_region.name)
-            new_region.add_connection(self.opposite_dirs[direction], existing_region.name)
+        for i in range(num_regions):
+            # Generisati naziv i opis pomocu CHAT GPT-a
+            new_region_name = f"Region_{len(self.regions) + 1}"
+            new_region_portrayal = f"A newly discovered area {new_region_name}."
+            new_region = Region(new_region_name, new_region_portrayal)
 
-        self.regions.append(new_region)
-        self.set_final_position(new_region)
-        return new_region
+            if previous_region:
+                available_directions = [d for d in self.opposite_dirs.keys() if d not in previous_region.connections]
+
+                if available_directions:
+                    direction = random.choice(available_directions)
+                    previous_region.add_connection(direction, new_region.name)
+                    new_region.add_connection(self.opposite_dirs[direction], previous_region.name)
+
+                # Dodatne konekcije ka vec postojecim regijama
+                num_extra_connections = random.choice([0, 0, 0, 1, 1, 2])
+                connected_regions = {previous_region}
+
+                for _ in range(num_extra_connections):
+                    existing_region = random.choice([r for r in self.regions if r not in connected_regions])
+                    available_directions = [d for d in self.opposite_dirs.keys() if
+                                            d not in existing_region.connections]
+
+                    if available_directions:
+                        direction = random.choice(available_directions)
+                        existing_region.add_connection(direction, new_region.name)
+                        new_region.add_connection(self.opposite_dirs[direction], existing_region.name)
+                        connected_regions.add(existing_region)
+
+            elif self.regions:
+                existing_region = self.final_position
+                available_directions = [d for d in self.opposite_dirs.keys() if d not in existing_region.connections]
+
+                if available_directions:
+                    direction = random.choice(available_directions)
+                    existing_region.add_connection(direction, new_region.name)
+                    new_region.add_connection(self.opposite_dirs[direction], existing_region.name)
+
+            self.regions.append(new_region)
+            previous_region = new_region
+
+        self.set_final_position(previous_region)
+        return previous_region
 
     # ChatGPT API TODO kasnije
     def generate_new_item(self):
@@ -57,22 +83,9 @@ class GameWorld:
         return new_item
 
     def explore_new_area(self):
-        new_region = self.generate_new_region()
-        print(f"You've discovered {new_region.name}!")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        num_new_regions = random.randint(3, 9)
+        last_region = self.generate_new_regions(num_new_regions)
+        print(f"You've discovered {num_new_regions} new areas, with {last_region.name} being the furthest!")
 
     def check_combat(self, region):
         for enemy in self.enemies:

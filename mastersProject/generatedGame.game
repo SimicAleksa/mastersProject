@@ -22,7 +22,6 @@ region throne_room {
     N -> dragon_lair,
     S -> grand_hall
     ::
-    requirements a_of_bravery
 }
 
 region dragon_lair {
@@ -74,7 +73,7 @@ player hero {
     levelScalingPercentage 100
     level 1
     portrayal "You are the kingdom's brave hero, determined to save the realm."
-    position castle_entrance
+    position dragon_lair
     inventory {
         h_potion, map
     }
@@ -92,7 +91,7 @@ player hero {
 enemy ancient_stone_dragon {
     portrayal "A massive stone dragon that shoots lightning from its mouth."
     position dragon_lair
-    health 11
+    health 1
     xp 100
     attacks {
         attack lightning_breath {
@@ -130,5 +129,5 @@ settings {
     additionalTurnAfterUse False
 }
 
-start_position castle_entrance
+start_position dragon_lair
 final_position victory_chamber

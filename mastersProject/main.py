@@ -65,8 +65,13 @@ def initial_setup():
 def run_main():
     initial_setup()
 
-    while game_world.player.position != game_world.final_position:
+    while True:
+        if game_world.player.position == game_world.final_position:
+            game_world.explore_new_area()
         user_input = input(">>").strip()
+        if user_input == "exit":
+            break
+
         process_command(user_input)
 
 

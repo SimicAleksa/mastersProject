@@ -1,4 +1,8 @@
 from random import uniform
+import random
+
+from mastersProject.dsl_classes.item import Item
+from mastersProject.dsl_classes.region import Region
 
 
 class GameWorld:
@@ -15,6 +19,60 @@ class GameWorld:
         self.prev_direction = None
         self.opposite_dirs = {"N": "S", "S": "N", "E": "W", "W": "E"}
         self.settings = None
+
+    # ChatGPT API
+    def generate_new_region(self):
+        # Generisati naziv i opis pomocu CHAT GPT-a
+        new_region_name = f"Region_{len(self.regions) + 1}"
+        new_region_portrayal = f"A newly discovered area {new_region_name}."
+        new_region = Region(new_region_name, new_region_portrayal)
+
+        if self.regions:
+            existing_region = None
+            for region in self.regions:
+                if region.name == self.final_position.name:
+                    existing_region = region
+            # Takodje obratiti paznju da se ne preklope putevi vec postojeci!!!!!
+            direction = random.choice(list(self.opposite_dirs.keys()))
+            existing_region.add_connection(direction, new_region.name)
+            new_region.add_connection(self.opposite_dirs[direction], existing_region.name)
+
+        self.regions.append(new_region)
+        self.set_final_position(new_region)
+        return new_region
+
+    # ChatGPT API TODO kasnije
+    def generate_new_item(self):
+        # Generisati naziv i opis pomocu CHAT GPT-a
+        new_item_name = f"Item_{len(self.items) + 1}"
+        new_item_portrayal = f"A mysterious object called {new_item_name}."
+        new_item = Item(new_item_name, new_item_portrayal, is_static=False)
+
+        # Dodati item u neku regiju (mozda dodati da se item stavlja u novokreirane regije)
+        if self.regions:
+            random_region = random.choice(self.regions)
+            random_region.add_item(new_item)
+
+        self.items[new_item_name] = new_item
+        return new_item
+
+    def explore_new_area(self):
+        new_region = self.generate_new_region()
+        print(f"You've discovered {new_region.name}!")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     def check_combat(self, region):
         for enemy in self.enemies:

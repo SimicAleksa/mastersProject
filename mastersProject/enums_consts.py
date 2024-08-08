@@ -25,7 +25,8 @@ POSSIBLE_COMMANDS = [
     "inc endurance",
     "inc strength",
     "inc intelligence",
-    "stats"
+    "stats",
+    "exit"
 ]
 
 

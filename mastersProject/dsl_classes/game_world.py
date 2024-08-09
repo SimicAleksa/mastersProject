@@ -70,8 +70,21 @@ class GameWorld:
                     existing_region.add_connection(direction, new_region.name)
                     new_region.add_connection(self.opposite_dirs[direction], existing_region.name)
 
+            # 25% sanse da ce postojati requiremnt
+            if random.random() < 1:
+                used_requirements = {req.item for region in self.regions for req in region.requirements}
+
+                eligible_items = [item for item in self.items.values() if
+                                  not item.isStatic and not item.activations
+                                  and item.name not in used_requirements]
+                if eligible_items:
+                    required_item = random.choice(eligible_items)
+                    required_item.item = required_item.name
+                    new_region.add_requirements(required_item)
+
             self.regions.append(new_region)
             previous_region = new_region
+
 
             # Dodavanje itema u regiju
             num_items = random.randint(1, 3)
@@ -83,11 +96,6 @@ class GameWorld:
                     temp_holder_weapon = self.generate_new_weapon()
                 else:
                     temp_holder_armor = self.generate_new_armor()
-
-
-            # Dodavanje oruzja u regiju
-            add_weapon_choice = random.choice([True, False])
-            new_weapon = self.generate_new_weapon()
 
         self.set_final_position(previous_region)
         return previous_region

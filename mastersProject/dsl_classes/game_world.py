@@ -111,7 +111,7 @@ class GameWorld:
 
         if contains_other_items:
             contained_item = self.generate_inner_item()
-            new_item.contains.append(contained_item)
+            new_item.contains.append(contained_item.name)
 
         last_region = self.regions[-1]
         last_region.add_item(new_item)
@@ -127,7 +127,7 @@ class GameWorld:
         activations = []
 
         # Na osnovu predjasnjih promenljivih generisati naziv i opis predmeta
-        new_inner_item_name = f"Item_{len(self.items) + 1}_Inner"
+        new_inner_item_name = f"Inner_Item_{len(self.items) + 1}"
         new_inner_item_portrayal = f"A mysterious object called {new_inner_item_name}."
 
         if action_class:

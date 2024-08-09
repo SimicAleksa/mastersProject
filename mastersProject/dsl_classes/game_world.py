@@ -2,6 +2,7 @@ from random import uniform
 import random
 
 from mastersProject.dsl_classes.actions import RestoreManaAction, HealAction
+from mastersProject.dsl_classes.armor import Armor
 from mastersProject.dsl_classes.item import Item
 from mastersProject.dsl_classes.region import Region
 from mastersProject.dsl_classes.weapon import Weapon
@@ -75,11 +76,16 @@ class GameWorld:
             # Dodavanje itema u regiju
             num_items = random.randint(1, 3)
             for _ in range(num_items):
-                new_item = self.generate_new_item()
-                # dodavanje itema u regiju je odradjeno u samoj funkciji (item se dodaje u posljednju regiju)
-                # u ovoj liniji je to odradjeno -> self.regions.append(new_region)
+                item_weapon_armor = random.choice([1, 2, 3])
+                if item_weapon_armor == 1:
+                    temp_holder_item = self.generate_new_item()
+                elif item_weapon_armor == 2:
+                    temp_holder_weapon = self.generate_new_weapon()
+                else:
+                    temp_holder_armor = self.generate_new_armor()
 
-            #Dodavanje oruzja u regiju
+
+            # Dodavanje oruzja u regiju
             add_weapon_choice = random.choice([True, False])
             new_weapon = self.generate_new_weapon()
 
@@ -145,7 +151,8 @@ class GameWorld:
         # prompt = "Generate a unique weapon for a fantasy adventure game. Include the weapon's name, portrayal, type, health damage, mana damage, health cost, mana cost, and required level."
         # response = call_chatgpt_api(prompt)
         # weapon_details = parse_response_to_weapon_details(response)
-        weapon_details = {"name": f"Weapon_{len(self.weapons) + 1}", "portrayal": "Port", "weaponType": "sword", "health_damage": "50",
+        weapon_details = {"name": f"Weapon_{len(self.weapons) + 1}", "portrayal": "Port", "weaponType": "sword",
+                          "health_damage": "50",
                           "mana_damage": "0", "health_cost": "0", "mana_cost": "0", "required_level": 0}
         weapon_to_return = Weapon(
             name=weapon_details['name'],
@@ -163,6 +170,28 @@ class GameWorld:
         last_region.add_item(weapon_to_return)
 
         return weapon_to_return
+
+    # ChatGPT API TODO kasnije
+    def generate_new_armor(self):
+        # prompt = "Generate a unique armor for a fantasy adventure game. Include the weapon's name, portrayal, type, health damage, mana damage, health cost, mana cost, and required level."
+        # response = call_chatgpt_api(prompt)
+        # weapon_details = parse_response_to_weapon_details(response)
+        armor_details = {"name": f"Armor{len(self.weapons) + 1}", "portrayal": "Port", "armorType": "sword",
+                         "defense": "0", "mana_defense": "0", "required_level": 0}
+        armor_to_return = Armor(
+            name=armor_details['name'],
+            portrayal=armor_details['portrayal'],
+            armorType=armor_details['armorType'],
+            defense=armor_details['defense'],
+            mana_defense=armor_details['mana_defense'],
+            required_level=armor_details['required_level']
+        )
+
+        self.armors[armor_to_return.name] = armor_to_return
+        last_region = self.regions[-1]
+        last_region.add_item(armor_to_return)
+
+        return armor_to_return
 
     def explore_new_area(self):
         num_new_regions = random.randint(3, 9)

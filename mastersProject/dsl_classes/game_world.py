@@ -1,5 +1,8 @@
 from random import uniform
 import random
+from openai import OpenAI
+from dotenv import load_dotenv
+import os
 
 from mastersProject.dsl_classes.actions import RestoreManaAction, HealAction
 from mastersProject.dsl_classes.armor import Armor
@@ -7,6 +10,8 @@ from mastersProject.dsl_classes.item import Item
 from mastersProject.dsl_classes.region import Region
 from mastersProject.dsl_classes.weapon import Weapon
 from mastersProject.enums_consts import EnvDmgTemp
+
+load_dotenv()
 
 
 class GameWorld:
@@ -24,15 +29,25 @@ class GameWorld:
         self.opposite_dirs = {"N": "S", "S": "N", "E": "W", "W": "E"}
         self.settings = None
 
+    def call_chatgpt(self, prompt):
+        client = OpenAI(api_key=os.environ.get("OPENAI_KEY"))
+        response = client.chat.completions.create(
+            model=os.environ.get("GPT_MODEL"),
+            messages=[{"role": "system", "content": prompt}]
+        )
+        return response.choices[0].message.content.strip()
+
     def generate_new_regions(self, num_regions):
         previous_region = None
-        # Ovde se moze pozvati ChatGpt da kreira nazive za novonastale regije
-
         for i in range(num_regions):
-            # Generisati naziv i opis pomocu CHAT GPT-a, a za ostale stvari (iteme) isto treba da bude ukljucen on nekako
-            # TODO takodje treba dodati i sledece stvati za svaku novokreiranu regiiju ->
-            new_region_name = f"Region_{len(self.regions) + 1}"
-            new_region_portrayal = f"A newly discovered area {new_region_name}."
+            prompt = f"Generate a unique region for a fantasy adventure game. Include only the region's name." \
+                     f" Here are the previously generated regions: {[region.name for region in self.regions]}." \
+                     f"Return just the name like this Generated Region Name. So just the name and nothing more!" \
+                     f"The each word in the name should start with an upper letter case and there should be a space" \
+                     f"between the words in the region name!"
+
+            new_region_name = self.call_chatgpt(prompt)
+            new_region_portrayal = "Temp portrayal"
             new_region = Region(new_region_name, new_region_portrayal)
 
             if previous_region:
@@ -88,19 +103,33 @@ class GameWorld:
 
             # Dodavanje itema u regiju
             num_items = random.randint(1, 3)
+            newly_added_items_armor_weapon_names = []
             for _ in range(num_items):
                 item_weapon_armor = random.choice([1, 2, 3])
                 if item_weapon_armor == 1:
                     temp_holder_item = self.generate_new_item()
+                    newly_added_items_armor_weapon_names.append(temp_holder_item.name)
                 elif item_weapon_armor == 2:
                     temp_holder_weapon = self.generate_new_weapon()
+                    newly_added_items_armor_weapon_names.append(temp_holder_weapon.name)
                 else:
                     temp_holder_armor = self.generate_new_armor()
+                    newly_added_items_armor_weapon_names.append(temp_holder_armor.name)
+
+            prompt = f"Generate a region portrayal for a fantasy adventure game." \
+                     f" Here are the previously generated regions: {[region.name for region in self.regions]}." \
+                     f"And here is the name of the region you are generating the portrayal to {new_region_name}." \
+                     f"Return just the portrayal. So just the region portray and nothing more!" \
+                     f"Keep this in mind the game region could have items,weapons,environmental damage and other things." \
+                     f"So im gonna list the things the game region has and you find a way to incorporate them into the" \
+                     f"region portrayal. The list is as follows: {newly_added_items_armor_weapon_names}"
+
+            new_region_portrayal = self.call_chatgpt(prompt)
+            new_region.set_portrayal(new_region_portrayal)
 
         self.set_final_position(previous_region)
         return previous_region
 
-    # ChatGPT API TODO kasnije
     def generate_new_item(self):
         contains_other_items = random.choice([True, False])
         is_static = contains_other_items
@@ -112,13 +141,37 @@ class GameWorld:
             action_class = random.choice(possible_actions)
             activations = []
 
-        # Na osnovu predjasnjih promenljivih generisati naziv i opis predmeta
-        new_item_name = f"Item_{len(self.items) + 1}"
-        new_item_portrayal = f"A mysterious object called {new_item_name}."
-
         if action_class:
             action_instance = action_class(random.randint(10, 50))
             activations.append(action_instance)
+
+        prompt = f"Generate an UNIQUE item name for a fantasy adventure game." \
+                 f" Here are the previously generated item names: {list(self.items.keys())}." \
+                 f"The item is placed inside the region named {self.regions[-1].name}." \
+                 f"Return just the name like this Generated Item Name. So just the name and nothing more!" \
+                 f"The each word in the name should start with an upper letter case and there should be a space" \
+                 f"between the words in the item name! Once again the name of the item should be unique and can not" \
+                 f"match any of the previously generated items!"
+
+        new_item_name = self.call_chatgpt(prompt)
+
+        prompt = f"Generate an item portrayal for a fantasy adventure game." \
+                 f" The generated item's name that need this portrayal is: {new_item_name}." \
+                 f"The item is placed inside the region named {self.regions[-1].name}." \
+                 f"Item has a couple of attributes like its static so it can not be taken and it represents a " \
+                 f"chest of sorts, or it contains some other " \
+                 f"items inside it, or it can be used so its not static and it doesnt have any items inside it but " \
+                 f"it has actions that can be triggered. The item you are creating this portrayal has the following" \
+                 f"attributes: contains other items = {contains_other_items}; is static = {contains_other_items};" \
+                 f"has the following actions {action_class} (this could be empty so its just None then); " \
+                 f"if the previous action is not None the usage of the item" \
+                 f"restores some amount health or mana (based on the action name). If the previous action is None, the"\
+                 f"item cannot be activated, instead it can be possibly used to open some door somewhere!" \
+                 f"Once again if the action is not HealAction or RestoreManaAction but instead its just None the item" \
+                 f"can not be activated EVER!" \
+                 f" Return just the item portrayal. So just the item portrayal and nothing more!"
+
+        new_item_portrayal = self.call_chatgpt(prompt)
 
         new_item = Item(new_item_name, new_item_portrayal, is_static=is_static)
         new_item.activations = activations
@@ -133,20 +186,47 @@ class GameWorld:
 
         return new_item
 
-    # ChatGPT API TODO kasnije NAKON OTVARANJA ITEMA INNER ITEM SE NE NALAZI U REGIJI
     def generate_inner_item(self):
         is_static = False
+        contains_other_items = False
         possible_actions = [HealAction, RestoreManaAction, None]
         action_class = random.choice(possible_actions)
         activations = []
 
-        # Na osnovu predjasnjih promenljivih generisati naziv i opis predmeta
         new_inner_item_name = f"Inner_Item_{len(self.items) + 1}"
         new_inner_item_portrayal = f"A mysterious object called {new_inner_item_name}."
 
         if action_class:
             action_instance = action_class(random.randint(10, 50))
             activations.append(action_instance)
+
+        prompt = f"Generate an UNIQUE item name for a fantasy adventure game." \
+                 f" Here are the previously generated item names: {list(self.items.keys())}." \
+                 f"The item is placed inside the region named {self.regions[-1].name}." \
+                 f"Return just the name like this Generated Item Name. So just the name and nothing more!" \
+                 f"The each word in the name should start with an upper letter case and there should be a space" \
+                 f"between the words in the item name! Once again the name of the item should be unique and can not" \
+                 f"match any of the previously generated items!"
+
+        new_inner_item_name = self.call_chatgpt(prompt)
+
+        prompt = f"Generate an item portrayal for a fantasy adventure game." \
+                 f" The generated item's name that need this portrayal is: {new_inner_item_name}." \
+                 f"The item is placed inside the region named {self.regions[-1].name}." \
+                 f"Item has a couple of attributes like its static so it can not be taken and it represents a " \
+                 f"chest of sorts, or it contains some other " \
+                 f"items inside it, or it can be used so its not static and it doesnt have any items inside it but " \
+                 f"it has actions that can be triggered. The item you are creating this portrayal has the following" \
+                 f"attributes: contains other items = {contains_other_items}; is static = {contains_other_items};" \
+                 f"has the following actions {action_class} (this could be empty so its just None then); " \
+                 f"if the previous action is not None the usage of the item" \
+                 f"restores some amount health or mana (based on the action name). If the previous action is None, the" \
+                 f"item cannot be activated, instead it can be possibly used to open some door somewhere!" \
+                 f"Once again if the action is not HealAction or RestoreManaAction but instead its just None the item" \
+                 f"can not be activated EVER!" \
+                 f" Return just the item portrayal. So just the item portrayal and nothing more!"
+
+        new_inner_item_portrayal = self.call_chatgpt(prompt)
 
         new_inner_item = Item(new_inner_item_name, new_inner_item_portrayal, is_static=is_static)
         new_inner_item.activations = activations

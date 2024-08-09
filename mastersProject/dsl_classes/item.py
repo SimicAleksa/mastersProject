@@ -25,4 +25,4 @@ class Item:
         for item in self.contains:
             items += item + ", "
         items = items[:-2]
-        return f'{self.portrayal}. Inside you see {items}'
+        return f'{self.portrayal} \n Quick summary of region pieces: Inside you see {items}'

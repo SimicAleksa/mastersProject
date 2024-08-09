@@ -7,6 +7,9 @@ class Region:
         self.requirements = []
         self.environmental_dmg = None
 
+    def set_portrayal(self, portrayal):
+        self.portrayal = portrayal
+
     def add_requirements(self, requirement):
         self.requirements.append(requirement)
 
@@ -32,7 +35,7 @@ class Region:
         items = items[:-2]
         text = f"You are in {self.portrayal}. "
         if items:
-            text += f"Inside you see {items}. "
+            text += f"\n Quick summary of region pieces: Inside you see {items}. "
         return text
 
     def print_requirements(self):

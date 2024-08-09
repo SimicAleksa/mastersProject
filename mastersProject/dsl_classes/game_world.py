@@ -1,8 +1,10 @@
 from random import uniform
 import random
 
+from mastersProject.dsl_classes.actions import RestoreManaAction, HealAction
 from mastersProject.dsl_classes.item import Item
 from mastersProject.dsl_classes.region import Region
+from mastersProject.dsl_classes.weapon import Weapon
 
 
 class GameWorld:
@@ -22,6 +24,7 @@ class GameWorld:
 
     def generate_new_regions(self, num_regions):
         previous_region = None
+        # Ovde se moze pozvati ChatGpt da kreira nazive za novonastale regije
 
         for i in range(num_regions):
             # Generisati naziv i opis pomocu CHAT GPT-a, a za ostale stvari (iteme) isto treba da bude ukljucen on nekako
@@ -69,27 +72,97 @@ class GameWorld:
             self.regions.append(new_region)
             previous_region = new_region
 
+            # Dodavanje itema u regiju
+            num_items = random.randint(1, 3)
+            for _ in range(num_items):
+                new_item = self.generate_new_item()
+                # dodavanje itema u regiju je odradjeno u samoj funkciji (item se dodaje u posljednju regiju)
+                # u ovoj liniji je to odradjeno -> self.regions.append(new_region)
+
+            #Dodavanje oruzja u regiju
+            add_weapon_choice = random.choice([True, False])
+            new_weapon = self.generate_new_weapon()
+
         self.set_final_position(previous_region)
         return previous_region
 
     # ChatGPT API TODO kasnije
     def generate_new_item(self):
-        # Generisati naziv i opis pomocu CHAT GPT-a
-        # TODO takodje treba dodati i sledece stvati za svaku novokreirani item ->
-        # self.contains = [] # hmmm ovo treba isto sa chatGPT-jem da on stavi neka oruzja ili armor unutar nekih itema
-        # self.activations = [] random od mogucih aktivacija jednu ili 0
-        # self.isStatic = is_static # opet random ali zavisi od price odnosno hajde ovako ako sadrzi nesto u sebi onda jeste static
+        contains_other_items = random.choice([True, False])
+        is_static = contains_other_items
+
+        action_class = None
+        activations = None
+        if not is_static:
+            possible_actions = [HealAction, RestoreManaAction, None]
+            action_class = random.choice(possible_actions)
+            activations = []
+
+        # Na osnovu predjasnjih promenljivih generisati naziv i opis predmeta
         new_item_name = f"Item_{len(self.items) + 1}"
         new_item_portrayal = f"A mysterious object called {new_item_name}."
-        new_item = Item(new_item_name, new_item_portrayal, is_static=False)
 
-        # Dodati item u neku regiju (mozda dodati da se item stavlja u novokreirane regije)
-        if self.regions:
-            random_region = random.choice(self.regions)
-            random_region.add_item(new_item)
+        if action_class:
+            action_instance = action_class(random.randint(10, 50))
+            activations.append(action_instance)
 
+        new_item = Item(new_item_name, new_item_portrayal, is_static=is_static)
+        new_item.activations = activations
+
+        if contains_other_items:
+            contained_item = self.generate_inner_item()
+            new_item.contains.append(contained_item)
+
+        last_region = self.regions[-1]
+        last_region.add_item(new_item)
         self.items[new_item_name] = new_item
+
         return new_item
+
+    # ChatGPT API TODO kasnije NAKON OTVARANJA ITEMA INNER ITEM SE NE NALAZI U REGIJI
+    def generate_inner_item(self):
+        is_static = False
+        possible_actions = [HealAction, RestoreManaAction, None]
+        action_class = random.choice(possible_actions)
+        activations = []
+
+        # Na osnovu predjasnjih promenljivih generisati naziv i opis predmeta
+        new_inner_item_name = f"Item_{len(self.items) + 1}_Inner"
+        new_inner_item_portrayal = f"A mysterious object called {new_inner_item_name}."
+
+        if action_class:
+            action_instance = action_class(random.randint(10, 50))
+            activations.append(action_instance)
+
+        new_inner_item = Item(new_inner_item_name, new_inner_item_portrayal, is_static=is_static)
+        new_inner_item.activations = activations
+
+        self.items[new_inner_item_name] = new_inner_item
+        return new_inner_item
+
+    # ChatGPT API TODO kasnije
+    def generate_new_weapon(self):
+        # prompt = "Generate a unique weapon for a fantasy adventure game. Include the weapon's name, portrayal, type, health damage, mana damage, health cost, mana cost, and required level."
+        # response = call_chatgpt_api(prompt)
+        # weapon_details = parse_response_to_weapon_details(response)
+        weapon_details = {"name": f"Weapon_{len(self.weapons) + 1}", "portrayal": "Port", "weaponType": "sword", "health_damage": "50",
+                          "mana_damage": "0", "health_cost": "0", "mana_cost": "0", "required_level": 0}
+        weapon_to_return = Weapon(
+            name=weapon_details['name'],
+            portrayal=weapon_details['portrayal'],
+            weaponType=weapon_details['weaponType'],
+            health_damage=weapon_details['health_damage'],
+            mana_damage=weapon_details['mana_damage'],
+            health_cost=weapon_details['health_cost'],
+            mana_cost=weapon_details['mana_cost'],
+            required_level=weapon_details['required_level']
+        )
+
+        self.weapons[weapon_to_return.name] = weapon_to_return
+        last_region = self.regions[-1]
+        last_region.add_item(weapon_to_return)
+
+        return weapon_to_return
 
     def explore_new_area(self):
         num_new_regions = random.randint(3, 9)

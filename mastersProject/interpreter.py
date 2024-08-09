@@ -18,6 +18,7 @@ def parse_dsl():
 
     # Parse the DSL file and create the GameWorld
     model = dsl_mm.model_from_file(join(this_folder, "generatedGame.game"))
+    # model = dsl_mm.model_from_file(join(this_folder, "testGame.game"))
 
     game_world = GameWorld()
 

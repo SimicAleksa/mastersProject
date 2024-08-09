@@ -6,6 +6,7 @@ from mastersProject.dsl_classes.armor import Armor
 from mastersProject.dsl_classes.item import Item
 from mastersProject.dsl_classes.region import Region
 from mastersProject.dsl_classes.weapon import Weapon
+from mastersProject.enums_consts import EnvDmgTemp
 
 
 class GameWorld:
@@ -30,10 +31,6 @@ class GameWorld:
         for i in range(num_regions):
             # Generisati naziv i opis pomocu CHAT GPT-a, a za ostale stvari (iteme) isto treba da bude ukljucen on nekako
             # TODO takodje treba dodati i sledece stvati za svaku novokreiranu regiiju ->
-            # self.items = {} #generate_new_item postoji funkcija koja se moze pokrenuti
-            # self.requirements = [] # staviti da je neki random item iz prethodnih itema koji ne moze da se aktivira potreban znaci od 0 do npr 2 sa tim itemima predjasnje spomenutim
-            # self.environmental_dmg = None # moze da se stavi random od 0 do npr 35
-            # NAPOMENA!! oruzja se nalaze u itemima ili se dobijaju kao drop od neprijatelja!!!!!
             new_region_name = f"Region_{len(self.regions) + 1}"
             new_region_portrayal = f"A newly discovered area {new_region_name}."
             new_region = Region(new_region_name, new_region_portrayal)
@@ -71,7 +68,7 @@ class GameWorld:
                     new_region.add_connection(self.opposite_dirs[direction], existing_region.name)
 
             # 25% sanse da ce postojati requiremnt
-            if random.random() < 1:
+            if random.random() < 0.25:
                 used_requirements = {req.item for region in self.regions for req in region.requirements}
 
                 eligible_items = [item for item in self.items.values() if
@@ -82,9 +79,12 @@ class GameWorld:
                     required_item.item = required_item.name
                     new_region.add_requirements(required_item)
 
+            if random.random() < 0.20:
+                env_damage = random.randint(5, 35)
+                new_region.add_environmental_dmg(EnvDmgTemp(env_damage, new_region))
+
             self.regions.append(new_region)
             previous_region = new_region
-
 
             # Dodavanje itema u regiju
             num_items = random.randint(1, 3)

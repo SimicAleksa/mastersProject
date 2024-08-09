@@ -35,3 +35,9 @@ def display_help():
     for command in POSSIBLE_COMMANDS:
         help_string += command + "\n"
     print(help_string[:-1])
+
+
+class EnvDmgTemp:
+    def __init__(self, amount, parent):
+        self.amount = amount
+        self.parent = parent

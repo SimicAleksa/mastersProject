@@ -165,7 +165,7 @@ class GameWorld:
                  f"attributes: contains other items = {contains_other_items}; is static = {contains_other_items};" \
                  f"has the following actions {action_class} (this could be empty so its just None then); " \
                  f"if the previous action is not None the usage of the item" \
-                 f"restores some amount health or mana (based on the action name). If the previous action is None, the"\
+                 f"restores some amount health or mana (based on the action name). If the previous action is None, the" \
                  f"item cannot be activated, instead it can be possibly used to open some door somewhere!" \
                  f"Once again if the action is not HealAction or RestoreManaAction but instead its just None the item" \
                  f"can not be activated EVER!" \
@@ -234,23 +234,57 @@ class GameWorld:
         self.items[new_inner_item_name] = new_inner_item
         return new_inner_item
 
-    # ChatGPT API TODO kasnije
     def generate_new_weapon(self):
-        # prompt = "Generate a unique weapon for a fantasy adventure game. Include the weapon's name, portrayal, type, health damage, mana damage, health cost, mana cost, and required level."
-        # response = call_chatgpt_api(prompt)
-        # weapon_details = parse_response_to_weapon_details(response)
-        weapon_details = {"name": f"Weapon_{len(self.weapons) + 1}", "portrayal": "Port", "weaponType": "sword",
-                          "health_damage": "50",
-                          "mana_damage": "0", "health_cost": "0", "mana_cost": "0", "required_level": 0}
+        weaponType = random.choice(self.player.can_equip)
+        required_level = random.randint(0, self.player.level + 1)
+
+        isMagicBasedWeapon = random.choice([True, False])
+        if isMagicBasedWeapon:
+            health_damage = random.randint(0, 10)
+            mana_damage = random.randint(15, 35)
+            health_cost = 0
+            mana_cost = random.randint(1, 15)
+        else:
+            health_damage = random.randint(15, 50)
+            mana_damage = 0
+            health_cost = random.randint(0, 25)
+            mana_cost = 0
+
+        prompt = f"Generate an UNIQUE weapon name for a fantasy adventure game." \
+                 f" Here are the previously generated item/weapon names: {list(self.items.keys())}." \
+                 f"The weapon is placed inside the region named {self.regions[-1].name}." \
+                 f" Weapons type is {weaponType} " \
+                 f"Return just the name like this Generated Weapon Name. So just the name and nothing more!" \
+                 f"The each word in the name should start with an upper letter case and there should be a space" \
+                 f"between the words in the item name! Once again the name of the item should be unique and can not" \
+                 f"match any of the previously generated items!"
+        weapon_name = self.call_chatgpt(prompt)
+
+        prompt = f"Generate a weapon portrayal for a fantasy adventure game." \
+                 f" The generated weapon's name that need this portrayal is: {weapon_name}." \
+                 f"The item is placed inside the region named {self.regions[-1].name}." \
+                 f"Weapon has a couple of attributes like: health_damage so that's the damage it deals to enemies based" \
+                 f" on your strength, mana_damage that's the damage the weapon does to enemies based on the players " \
+                 f"intelligence, health_cost this is a stat that's used for balancing a weapon so when the player uses " \
+                 f"the weapon the health_cost stat is used to take that much health off the players health, mana_cost is" \
+                 f" similar to health_cost but instead of lowering players health it lowers players mana, weaponType is" \
+                 f" used to determine the type of the weapon" \
+                 f" The weapon you are creating this portrayal has the following attributes:" \
+                 f"health_damage = {health_damage}; mana_damage = {mana_damage} ; health_cost = {health_cost};" \
+                 f" mana_cost = {mana_cost}; weaponType = {weaponType}" \
+                 f" Return just the item portrayal. So just the item portrayal and nothing more!"
+
+        weapon_portrayal = self.call_chatgpt(prompt)
+
         weapon_to_return = Weapon(
-            name=weapon_details['name'],
-            portrayal=weapon_details['portrayal'],
-            weaponType=weapon_details['weaponType'],
-            health_damage=weapon_details['health_damage'],
-            mana_damage=weapon_details['mana_damage'],
-            health_cost=weapon_details['health_cost'],
-            mana_cost=weapon_details['mana_cost'],
-            required_level=weapon_details['required_level']
+            name=weapon_name,
+            portrayal=weapon_portrayal,
+            weaponType=weaponType,
+            health_damage=health_damage,
+            mana_damage=mana_damage,
+            health_cost=health_cost,
+            mana_cost=mana_cost,
+            required_level=required_level
         )
 
         self.weapons[weapon_to_return.name] = weapon_to_return

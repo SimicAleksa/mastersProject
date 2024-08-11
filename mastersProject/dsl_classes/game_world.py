@@ -117,9 +117,8 @@ class GameWorld:
                     temp_holder_armor = self.generate_new_armor(is_enemy_drop)
                     newly_added_items_armor_weapon_names.append(temp_holder_armor.name)
 
-            # TODO stavi 0.30
             enemy = None
-            if random.random() < 1:
+            if random.random() < 0.30:
                 enemy = self.generate_new_enemy()
                 # prilikom kreiranja samog neprijarelja se postavlja u kojoj regiji se on nalazi
 

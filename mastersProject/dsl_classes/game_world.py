@@ -83,7 +83,6 @@ class GameWorld:
                     existing_region.add_connection(direction, new_region.name)
                     new_region.add_connection(self.opposite_dirs[direction], existing_region.name)
 
-            # 25% sanse da ce postojati requiremnt
             if random.random() < 0.25:
                 used_requirements = {req.item for region in self.regions for req in region.requirements}
 
@@ -119,6 +118,7 @@ class GameWorld:
                     newly_added_items_armor_weapon_names.append(temp_holder_armor.name)
 
             # TODO stavi 0.30
+            enemy = None
             if random.random() < 1:
                 enemy = self.generate_new_enemy()
                 # prilikom kreiranja samog neprijarelja se postavlja u kojoj regiji se on nalazi
@@ -129,7 +129,9 @@ class GameWorld:
                      f"Return just the portrayal. So just the region portray and nothing more!" \
                      f"Keep this in mind the game region could have items,weapons,environmental damage and other things." \
                      f"So im gonna list the things the game region has and you find a way to incorporate them into the" \
-                     f"region portrayal. The list is as follows: {newly_added_items_armor_weapon_names}"
+                     f"region portrayal. The list is as follows: {newly_added_items_armor_weapon_names}. Also there is" \
+                     f" a possibility that the region has an enemy so if the following is None, there is no enemy." \
+                     f" The name of the enemy inside this region is {enemy.name}."
 
             new_region_portrayal = self.call_chatgpt(prompt)
             new_region.set_portrayal(new_region_portrayal)
@@ -522,7 +524,8 @@ class GameWorld:
 
         self.player.set_health(player_health)
         self.player.set_mana(player_mana)
-        text = f"{self.current_enemy.name}'s turn.\n{self.current_enemy.name} dealt {damage} damage. You have {self.player.get_health()} health."
+        text = f"{self.current_enemy.name} uses {chosen_attack['name']}.\n{self.current_enemy.name} dealt {damage} " \
+               f"damage. You have {self.player.get_health()} health."
         # TODO: print player mana stats
         self.current_enemy.reduce_health(chosen_attack["health_cost"])
         self.current_enemy.reduce_mana(chosen_attack["mana_cost"])

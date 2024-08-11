@@ -295,18 +295,47 @@ class GameWorld:
 
     # ChatGPT API TODO kasnije
     def generate_new_armor(self):
-        # prompt = "Generate a unique armor for a fantasy adventure game. Include the weapon's name, portrayal, type, health damage, mana damage, health cost, mana cost, and required level."
-        # response = call_chatgpt_api(prompt)
-        # weapon_details = parse_response_to_weapon_details(response)
-        armor_details = {"name": f"Armor{len(self.weapons) + 1}", "portrayal": "Port", "armorType": "sword",
-                         "defense": "0", "mana_defense": "0", "required_level": 0}
+        armorType = random.choice(self.player.can_equip)
+        required_level = random.randint(0, self.player.level + 1)
+
+        isMagicBasedDefense = random.choice([True, False])
+        if isMagicBasedDefense:
+            defense = random.randint(0, 10)
+            mana_defense = random.randint(15, 35)
+        else:
+            defense = random.randint(15, 50)
+            mana_defense = 0
+
+        prompt = f"Generate an UNIQUE armor name for a fantasy adventure game." \
+                 f" Here are the previously generated item/weapon/armor names: {list(self.items.keys())}." \
+                 f"The weapon is placed inside the region named {self.regions[-1].name}." \
+                 f" Armor type is {armorType} " \
+                 f"Return just the name like this Generated Armor Name. So just the name and nothing more!" \
+                 f"The each word in the name should start with an upper letter case and there should be a space" \
+                 f"between the words in the item name! Once again the name of the item should be unique and can not" \
+                 f"match any of the previously generated items!"
+
+        armor_name = self.call_chatgpt(prompt)
+
+        prompt = f"Generate an armor portrayal for a fantasy adventure game." \
+                 f" The generated armor's name that need this portrayal is: {armor_name}." \
+                 f"The item is placed inside the region named {self.regions[-1].name}." \
+                 f"Armor has a couple of attributes like: defense so that's the damage negation based" \
+                 f" that lowers enemy's attack strength (player take less raw damage), mana_defense that's the magic based" \
+                 f" negation that lowers enemy's magic strength (player takes less magic damage) " \
+                 f" The armor you are creating this portrayal has the following attributes:" \
+                 f"defense = {defense}; mana_defense = {mana_defense} " \
+                 f" Return just the item portrayal. So just the item portrayal and nothing more!"
+
+        armor_portrayal = self.call_chatgpt(prompt)
+
         armor_to_return = Armor(
-            name=armor_details['name'],
-            portrayal=armor_details['portrayal'],
-            armorType=armor_details['armorType'],
-            defense=armor_details['defense'],
-            mana_defense=armor_details['mana_defense'],
-            required_level=armor_details['required_level']
+            name=armor_name,
+            portrayal=armor_portrayal,
+            armorType=armorType,
+            defense=defense,
+            mana_defense=mana_defense,
+            required_level=required_level
         )
 
         self.armors[armor_to_return.name] = armor_to_return

@@ -6,6 +6,7 @@ import os
 
 from mastersProject.dsl_classes.actions import RestoreManaAction, HealAction
 from mastersProject.dsl_classes.armor import Armor
+from mastersProject.dsl_classes.enemy import Enemy
 from mastersProject.dsl_classes.item import Item
 from mastersProject.dsl_classes.region import Region
 from mastersProject.dsl_classes.weapon import Weapon
@@ -94,7 +95,7 @@ class GameWorld:
                     required_item.item = required_item.name
                     new_region.add_requirements(required_item)
 
-            if random.random() < 0.20:
+            if random.random() < 0.15:
                 env_damage = random.randint(5, 35)
                 new_region.add_environmental_dmg(EnvDmgTemp(env_damage, new_region))
 
@@ -104,17 +105,23 @@ class GameWorld:
             # Dodavanje itema u regiju
             num_items = random.randint(1, 3)
             newly_added_items_armor_weapon_names = []
+            is_enemy_drop = False
             for _ in range(num_items):
                 item_weapon_armor = random.choice([1, 2, 3])
                 if item_weapon_armor == 1:
-                    temp_holder_item = self.generate_new_item()
+                    temp_holder_item = self.generate_new_item(is_enemy_drop)
                     newly_added_items_armor_weapon_names.append(temp_holder_item.name)
                 elif item_weapon_armor == 2:
-                    temp_holder_weapon = self.generate_new_weapon()
+                    temp_holder_weapon = self.generate_new_weapon(is_enemy_drop)
                     newly_added_items_armor_weapon_names.append(temp_holder_weapon.name)
                 else:
-                    temp_holder_armor = self.generate_new_armor()
+                    temp_holder_armor = self.generate_new_armor(is_enemy_drop)
                     newly_added_items_armor_weapon_names.append(temp_holder_armor.name)
+
+            # TODO stavi 0.30
+            if random.random() < 1:
+                enemy = self.generate_new_enemy()
+                # prilikom kreiranja samog neprijarelja se postavlja u kojoj regiji se on nalazi
 
             prompt = f"Generate a region portrayal for a fantasy adventure game." \
                      f" Here are the previously generated regions: {[region.name for region in self.regions]}." \
@@ -130,7 +137,101 @@ class GameWorld:
         self.set_final_position(previous_region)
         return previous_region
 
-    def generate_new_item(self):
+    def generate_new_enemy(self):
+        all_enemy_names = [enemy.name for enemy in self.enemies]
+        enemy_position = self.regions[-1]
+        enemy_health = random.randint(50, 300)
+        enemy_mana = random.randint(50, 300)
+        enemy_xp = random.randint(50, 300)
+
+        prompt = f"Generate an UNIQUE enemy name for a fantasy adventure game." \
+                 f" Here are the previously generated enemy names: {all_enemy_names}." \
+                 f"The enemy is placed inside the region named {self.regions[-1].name}." \
+                 f"Return just the name of the enemy like this Generated Enemy Name. So just the name and nothing more!" \
+                 f"The each word in the name should start with an upper letter case and there should be a space" \
+                 f"between the words in the item name! Once again the name of the enemy should be unique and can not" \
+                 f"match any of the previously generated names!"
+        enemy_name = self.call_chatgpt(prompt)
+
+        prompt = f"Generate an enemy portrayal for a fantasy adventure game." \
+                 f" The generated enemy's name that need this portrayal is: {enemy_name}." \
+                 f"The enemy is placed inside the region named {self.regions[-1].name}." \
+                 f" Return just the enemy portrayal. So just the enemy portrayal and nothing more!"
+
+        enemy_portrayal = self.call_chatgpt(prompt)
+
+        new_enemy = Enemy(enemy_name, enemy_portrayal, enemy_position, enemy_health, enemy_mana, enemy_xp)
+        new_enemy.healing_chance = round(random.uniform(0.1, 0.5), 1)
+        new_enemy.healing_amount = random.randint(5, 50)
+        new_enemy.healing_amount_variance = round(random.uniform(0.1, 0.5), 1)
+
+        num_items = random.randint(1, 3)
+        newly_added_items_armor_weapon_names = []
+        is_enemy_drop = True
+
+        for _ in range(num_items):
+            item_weapon_armor = random.choice([1, 2, 3])
+            if item_weapon_armor == 1:
+                temp_holder_item = self.generate_new_item(is_enemy_drop)
+                newly_added_items_armor_weapon_names.append(temp_holder_item.name)
+                new_enemy.items_to_drop[temp_holder_item.name] = temp_holder_item
+            elif item_weapon_armor == 2:
+                temp_holder_weapon = self.generate_new_weapon(is_enemy_drop)
+                newly_added_items_armor_weapon_names.append(temp_holder_weapon.name)
+                new_enemy.items_to_drop[temp_holder_weapon.name] = temp_holder_weapon
+            else:
+                temp_holder_armor = self.generate_new_armor(is_enemy_drop)
+                newly_added_items_armor_weapon_names.append(temp_holder_armor.name)
+                new_enemy.items_to_drop[temp_holder_armor.name] = temp_holder_armor
+
+        num_attacks = random.randint(1, 3)
+        for _ in range(num_attacks):
+            isMagicBasedAttack = random.choice([True, False])
+            if isMagicBasedAttack:
+                attack_health_damage = random.randint(0, 10)
+                attack_health_damage_variance = round(random.uniform(0.1, 0.5), 1)
+                attack_mana_damage = random.randint(15, 35)
+                attack_mana_damage_variance = round(random.uniform(0.1, 0.5), 1)
+                attack_health_cost = 0
+                attack_mana_cost = random.randint(1, 15)
+            else:
+                attack_health_damage = random.randint(5, 50)
+                attack_health_damage_variance = round(random.uniform(0.1, 0.5), 1)
+                attack_mana_damage = 0
+                attack_mana_damage_variance = 0
+                attack_health_cost = random.randint(0, 25)
+                attack_mana_cost = 0
+
+            attack_frequency = round(random.uniform(0.1, 0.8), 1)
+
+            prompt = f"Generate an enemy attack name for a fantasy adventure game." \
+                     f"The enemy is placed inside the region named {self.regions[-1].name}." \
+                     f"Enemy's name is {new_enemy.name}. The attack is either magic based or not. For this attack" \
+                     f" the value of isMagicBasedAttack is equal to {isMagicBasedAttack} " \
+                     f"Return just the name of the enemy's attack like this Generated Enemy Attack Name. " \
+                     f"So just the name and nothing more!" \
+                     f"The each word in the name should start with an upper letter case and there should be a space" \
+                     f"between the words in the item name!"
+
+            attack_name = self.call_chatgpt(prompt)
+
+            attack = {
+                'name': attack_name,
+                'health_damage': attack_health_damage,
+                'health_damage_variance': attack_health_damage_variance,
+                'mana_damage': attack_mana_damage,
+                'mana_damage_variance': attack_mana_damage_variance,
+                'health_cost': attack_health_cost,
+                'mana_cost': attack_mana_cost,
+                'frequency': attack_frequency
+            }
+            new_enemy.attacks.append(attack)
+
+        self.enemies.append(new_enemy)
+
+        return new_enemy
+
+    def generate_new_item(self, is_enemy_drop):
         contains_other_items = random.choice([True, False])
         is_static = contains_other_items
 
@@ -181,7 +282,8 @@ class GameWorld:
             new_item.contains.append(contained_item.name)
 
         last_region = self.regions[-1]
-        last_region.add_item(new_item)
+        if not is_enemy_drop:
+            last_region.add_item(new_item)
         self.items[new_item_name] = new_item
 
         return new_item
@@ -192,9 +294,6 @@ class GameWorld:
         possible_actions = [HealAction, RestoreManaAction, None]
         action_class = random.choice(possible_actions)
         activations = []
-
-        new_inner_item_name = f"Inner_Item_{len(self.items) + 1}"
-        new_inner_item_portrayal = f"A mysterious object called {new_inner_item_name}."
 
         if action_class:
             action_instance = action_class(random.randint(10, 50))
@@ -234,7 +333,7 @@ class GameWorld:
         self.items[new_inner_item_name] = new_inner_item
         return new_inner_item
 
-    def generate_new_weapon(self):
+    def generate_new_weapon(self, is_enemy_drop):
         weaponType = random.choice(self.player.can_equip)
         required_level = random.randint(0, self.player.level + 1)
 
@@ -289,12 +388,12 @@ class GameWorld:
 
         self.weapons[weapon_to_return.name] = weapon_to_return
         last_region = self.regions[-1]
-        last_region.add_item(weapon_to_return)
+        if not is_enemy_drop:
+            last_region.add_item(weapon_to_return)
 
         return weapon_to_return
 
-    # ChatGPT API TODO kasnije
-    def generate_new_armor(self):
+    def generate_new_armor(self, is_enemy_drop):
         armorType = random.choice(self.player.can_equip)
         required_level = random.randint(0, self.player.level + 1)
 
@@ -340,7 +439,9 @@ class GameWorld:
 
         self.armors[armor_to_return.name] = armor_to_return
         last_region = self.regions[-1]
-        last_region.add_item(armor_to_return)
+
+        if not is_enemy_drop:
+            last_region.add_item(armor_to_return)
 
         return armor_to_return
 

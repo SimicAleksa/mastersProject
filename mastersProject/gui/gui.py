@@ -26,19 +26,28 @@ class App:
         self.navbar.add_command(label="Create Fiction", command=lambda: self.show_fiction_frame(None))
         self.navbar.add_command(label="Library", command=self.show_library_frame)
 
+        # Background setup on root window
+        pill_image = Image.open(os.path.join(os.getcwd(), "gui\\background.jpg"))
+        resized_image = pill_image.resize((window_width, window_height))
+        background_image = ImageTk.PhotoImage(resized_image)
+        background_label = tk.Label(self.root, image=background_image)
+        background_label.place(relwidth=1, relheight=1)
+        self.background_image = background_image  # Store reference to avoid garbage collection
+
         # Initialize frames
         self.start_frame = ttk.Frame(self.root, padding=20)
         self.fiction_frame = ttk.Frame(self.root, padding=20)
+        self.fiction_frame.config(style="Transparent.TFrame")
         self.library_frame = ttk.Frame(self.root, padding=20)
+        self.library_frame.config(style="Transparent.TFrame")
         self.play_frame = ttk.Frame(self.root, padding=20)
         self.picture_creator_frame = ttk.Frame(self.root, padding=20)
 
-        # Background setup
-        pill_image = Image.open(os.path.join(os.getcwd(), "gui\\background.jpg"))
-        background_image = ImageTk.PhotoImage(pill_image)
-        background_label = tk.Label(self.start_frame, image=background_image)
-        background_label.place(relwidth=1, relheight=1)
-        self.background_image = background_image
+        # Style setup
+        frame_bg = '#ffffff'
+        frame_opacity = 0.5
+        style = ttk.Style()
+        style.configure("Transparent.TFrame", background=self.adjust_color_opacity(frame_bg, frame_opacity))
 
         # Initialize text area
         self.text_area = tk.Text(self.fiction_frame, wrap=tk.WORD, width=90, height=50)
@@ -66,6 +75,12 @@ class App:
 
         self.root.mainloop()
 
+    def adjust_color_opacity(self,color, opacity):
+        r = int(color[1:3], 16)
+        g = int(color[3:5], 16)
+        b = int(color[5:7], 16)
+        return f'#{int(r * opacity):02x}{int(g * opacity):02x}{int(b * opacity):02x}'
+
     def show_play_frame(self):
         self._hide_all_frames()
         selected_game = self.games_listbox.get(tk.ACTIVE)
@@ -87,7 +102,7 @@ class App:
 
     def show_library_frame(self):
         self._hide_all_frames()
-        self.library_frame.pack()
+        self.library_frame.pack(padx= 20,pady =200)
 
     def show_picture_creator_frame(self):
         self._hide_all_frames()
@@ -99,7 +114,7 @@ class App:
 
     def on_game_selected(self, content=None):
         self.fiction_frame = CodeEditorFrame(self.root, content)
-        self.fiction_frame.pack()
+        self.fiction_frame.pack(padx= 20,pady =20)
         if content is None:
             messagebox.showinfo("Information", "Steps when saving your game:\n"
                                                "1) Create a new folder with the same name as your game (e.g., 'simplegame.game') inside the games folder.\n"

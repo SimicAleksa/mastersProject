@@ -3,6 +3,8 @@ import ctypes
 import re
 import tkinter.font as tkfont
 from tkinter import ttk, filedialog
+import tkinter as tk
+
 
 class CodeEditorFrame(ttk.Frame):
     def __init__(self, parent, content=None):

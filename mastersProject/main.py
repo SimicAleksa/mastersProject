@@ -1,4 +1,5 @@
 from mastersProject.enums_consts import DIRECTIONS, display_help
+from mastersProject.gui.gui import App
 from mastersProject.interpreter import parse_dsl
 from mastersProject.game_generator import generate_game_from_prompt
 
@@ -81,4 +82,6 @@ if __name__ == "__main__":
     # print(generated_game_path)
 
 
-    run_main()
+    # run_main()
+
+    App()

@@ -91,7 +91,7 @@ class App:
                 content = file.read()
             with_images = self.with_images_var.get()
             self.play_frame = GamePlayFrame(self.root, selected_game, with_images)
-            self.play_frame.pack(padx=20, pady=200)
+            self.play_frame.pack(padx=20, pady=100)
 
     def show_start_frame(self):
         self._hide_all_frames()

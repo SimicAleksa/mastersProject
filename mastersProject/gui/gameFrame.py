@@ -38,17 +38,17 @@ class GamePlayFrame(ttk.Frame):
         self.input_entry.bind("<Return>", lambda event: self.process_user_input(event, with_images, game_title))
 
         if with_images:
-            self.image_label = tk.Label(self, width=512, height=512)
+            self.image_label = tk.Label(self, width=256, height=256)
             self.image_label.pack()
             self.generate_image(self.gameWorld.regions[0].name, game_title)
 
     def generate_image(self, region_name, game_title):
-        image_path = os.path.join("if_dsl_gui_ai/games", game_title, region_name + ".png")
+        image_path = os.path.join(os.getcwd(), "games",game_title, region_name + ".png")
         if os.path.exists(image_path):
             self.img_fromPipe = Image.open(image_path)
         else:
-            self.img_fromPipe = Image.open(join(self.this_folder, "noImg.png"))
-        self.img = self.img_fromPipe.resize((512, 512))
+            self.img_fromPipe = Image.open(join(self.this_folder, "resources\\noImage.png"))
+        self.img = self.img_fromPipe.resize((256, 256))
         self.img = ImageTk.PhotoImage(self.img)
         self.image_label.config(image=self.img)
 

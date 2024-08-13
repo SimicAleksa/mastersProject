@@ -4,6 +4,7 @@ from PIL import Image, ImageTk
 import os
 from mastersProject.gui.codeEditorFrame import CodeEditorFrame
 from mastersProject.gui.gameFrame import GamePlayFrame
+from mastersProject.gui.gptCreationFrame import GptCreatorFrame
 from mastersProject.gui.pictureCreatorFrame import PictureCreatorFrame
 
 
@@ -25,6 +26,7 @@ class App:
         self.root.config(menu=self.navbar)
         self.navbar.add_command(label="Start", command=self.show_start_frame)
         self.navbar.add_command(label="Create Fiction", command=lambda: self.show_fiction_frame(None))
+        self.navbar.add_command(label="GPT creation", command=self.show_gpt_creation_frame)
         self.navbar.add_command(label="Library", command=self.show_library_frame)
 
         # Background setup on root window
@@ -41,6 +43,7 @@ class App:
         self.fiction_frame.config(style="Transparent.TFrame")
         self.library_frame = ttk.Frame(self.root, padding=20)
         self.library_frame.config(style="Transparent.TFrame")
+        self.gpt_creation_frame = ttk.Frame(self.root, padding=20)
         self.play_frame = ttk.Frame(self.root, padding=20)
         self.picture_creator_frame = ttk.Frame(self.root, padding=20)
 
@@ -105,6 +108,11 @@ class App:
         self._hide_all_frames()
         self.library_frame.pack(padx=20, pady=200)
 
+    def show_gpt_creation_frame(self):
+        self._hide_all_frames()
+        self.gpt_creation_frame = GptCreatorFrame(self.root)
+        self.gpt_creation_frame.pack(padx=20, pady=100)
+
     def show_picture_creator_frame(self):
         self._hide_all_frames()
         selected_game = self.games_listbox.get(tk.ACTIVE)
@@ -148,6 +156,6 @@ class App:
                 self.show_fiction_frame(content)
 
     def _hide_all_frames(self):
-        for frame in [self.start_frame, self.fiction_frame, self.library_frame, self.play_frame,
-                      self.picture_creator_frame]:
+        for frame in [self.start_frame, self.fiction_frame, self.library_frame, self.gpt_creation_frame,
+                      self.play_frame, self.picture_creator_frame]:
             frame.pack_forget()

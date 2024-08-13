@@ -1,18 +1,14 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-from functools import partial  # For triggering only when the button is clicked
+from functools import partial
 import requests
 
 from mastersProject.interpreter import parse_dsl
 from PIL import ImageTk, Image
-from os.path import join, dirname
 import os
-import openai
-import base64
 from io import BytesIO
 from openai import OpenAI
 
-# Initialize OpenAI API with your API key
 client = OpenAI(api_key=os.environ.get("OPENAI_KEY"))
 
 
@@ -91,11 +87,11 @@ class PictureCreatorFrame(ttk.Frame):
         prompt = self.text_area.get("1.0", "end-1c").lower()
 
         response = client.images.generate(
-                model="dall-e-2",
-                prompt=prompt,
-                size="256x256",
-                n=4,
-            )
+            model="dall-e-2",
+            prompt=prompt,
+            size="256x256",
+            n=4,
+        )
         self.img0_fromPipe = Image.open(BytesIO(requests.get(response.data[0].url).content))
         self.img1_fromPipe = Image.open(BytesIO(requests.get(response.data[1].url).content))
         self.img2_fromPipe = Image.open(BytesIO(requests.get(response.data[2].url).content))

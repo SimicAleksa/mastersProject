@@ -82,6 +82,11 @@ class Player:
             f"\nHealth - {self.health}\nDefence - {self.defence}\nDamage - {self.damage}\nMana - {self.mana}"
             f"\nMana damage - {self.mana_damage} \nMana defence - {self.mana_defence}\nMax health - {self.current_max_health}\nMax mana - {self.current_max_mana}")
 
+    def get_stats_string(self):
+        return f"Current stats:\nVigor - {self.vigor}\nEndurance - {self.endurance}\nStrength - {self.strength}\nIntelligence - {self.intelligence}" \
+               f"\nHealth - {self.health}\nDefence - {self.defence}\nDamage - {self.damage}\nMana - {self.mana}" \
+               f"\nMana damage - {self.mana_damage} \nMana defence - {self.mana_defence}\nMax health - {self.current_max_health}\nMax mana - {self.current_max_mana}"
+
     def inc_stat(self, stat):
         if stat == "vigor":
             return self.inc_vigor()
@@ -159,6 +164,7 @@ class Player:
             self.reapply_modification_single_stat('current_max_mana')
 
     def monster_slain(self, current_enemy):
+        string_to_return = ""
         self.current_experience += current_enemy.get_xp_value()
         if self.current_experience >= self.needed_experience_for_level_up:
             while self.current_experience >= self.needed_experience_for_level_up:
@@ -166,8 +172,11 @@ class Player:
                 self.level += 1
                 self.level_points += 1
                 self.needed_experience_for_level_up *= (1 + (self.levelScalingPercentage / 100))
+                string_to_return += f"You leveled up to: {self.level} level. \n"
                 print(f"You leveled up to: {self.level} level.")
             print(f"You have {self.level_points} points to use")
+            string_to_return += f"You have {self.level_points} points to use \n"
+        return string_to_return
 
     def get_health(self):
         return self.health
@@ -299,7 +308,6 @@ class Player:
                 self.weapon = None
             self._drop_other_weapons(weapon, game_world)
 
-
     def take_armor(self, armor, game_world):
         self.inventory.append(armor)
         self.remove_item(armor)
@@ -308,7 +316,6 @@ class Player:
                 self.remove_stat_modifications(self.armor)
                 self.armor = None
             self._drop_other_armors(armor, game_world)
-
 
     def apply_stat_modifications(self, item):
         for property_to_modify, coefficients in item.modifiers.items():
@@ -329,7 +336,8 @@ class Player:
             setattr(self, property_to_modify, original_value)
 
     def drop(self, item, game_world):
-        if (self.weapon is not None and self.weapon.name == item) or (self.armor is not None and self.armor.name == item):
+        if (self.weapon is not None and self.weapon.name == item) or (
+                self.armor is not None and self.armor.name == item):
             self.unequip(item, game_world)
         if item in self.inventory:
             self.inventory.remove(item)
@@ -368,7 +376,6 @@ class Player:
                 self.position.items[weapon] = game_world.weapons[weapon]
                 self.inventory.remove(weapon)
                 print("You dropped " + weapon + " in " + self.position.name)
-
 
     def _drop_other_armors(self, item, game_world):
         for armor in game_world.armors:

@@ -466,19 +466,25 @@ class GameWorld:
         self.final_position = region
 
     def flee(self):
+        string_to_return = ""
         if self.current_enemy is not None:
+            string_to_return += "You fled! \n"
             print("You fled!")
             self.current_enemy = None
             self.player.move(self.opposite_dirs[self.prev_direction], self)
             print(self.player.print_self())
+            string_to_return += self.player.print_self() + "\n"
         else:
+            string_to_return += "No reason to flee you coward!!! \n"
             print("No reason to flee you coward!!!")
+        return string_to_return
 
     def attack_enemy(self):
         damage = int(self.player.strike_damage() * uniform(0.7, 1.3))
         mana_damage = int(self.player.get_mana_damage() * uniform(0.7, 1.3))
         enemy_health = max(self.current_enemy.get_health() - damage, 0)
         enemy_mana = max(self.current_enemy.get_mana() - mana_damage, 0)
+        str_to_return = ""
 
         self.current_enemy.set_health(enemy_health)
         self.current_enemy.set_mana(enemy_mana)
@@ -487,23 +493,30 @@ class GameWorld:
             self.player.mana -= self.player.weapon.mana_cost
             self.player.health -= self.player.weapon.health_cost
             if self.player.weapon.mana_cost > 0:
+                str_to_return += f"You have {self.player.mana} mana left \n"
                 print(f"You have {self.player.mana} mana left")
             if self.player.weapon.health_cost > 0:
+                str_to_return += f"You have {self.player.health} health left \n"
                 print(f"You have {self.player.health} health left")
+        str_to_return += f"You dealt {damage} damage. Enemy has {self.current_enemy.get_health()} health. \n"
         print(f"You dealt {damage} damage. Enemy has {self.current_enemy.get_health()} health.")
         if enemy_health == 0:
+            str_to_return += f"You beat {self.current_enemy.name}! \n"
             print(f"You beat {self.current_enemy.name}!")
             self.current_enemy.set_position_none()
-            self.player.monster_slain(self.current_enemy)
+            str_to_return += self.player.monster_slain(self.current_enemy)
             dropped_items = self.current_enemy.get_droppable()
             for item in dropped_items:
                 self.player.position.items[item.name] = item
             if len(dropped_items) > 0:
+                str_to_return += f"{self.current_enemy.name} dropped {', '.join([item.name for item in dropped_items])} \n"
                 print(f"{self.current_enemy.name} dropped {', '.join([item.name for item in dropped_items])}")
             self.current_enemy = None
         else:
             self.heal_enemy()
+            str_to_return += self.attack_player() + "\n"
             print(self.attack_player())
+        return str_to_return
 
     def attack_player(self):
         chosen_attack = self.current_enemy.choose_attack()

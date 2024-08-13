@@ -3,6 +3,7 @@ from tkinter import ttk, messagebox
 from PIL import Image, ImageTk
 import os
 from mastersProject.gui.codeEditorFrame import CodeEditorFrame
+from mastersProject.gui.gameFrame import GamePlayFrame
 from mastersProject.gui.pictureCreatorFrame import PictureCreatorFrame
 
 
@@ -11,7 +12,6 @@ class App:
         self.root = tk.Tk()
         self.root.title("Interactive Fiction Creator")
 
-        # Set the window size and center it
         window_width = 1200
         window_height = 985
         screen_width = self.root.winfo_screenwidth()
@@ -33,7 +33,7 @@ class App:
         background_image = ImageTk.PhotoImage(resized_image)
         background_label = tk.Label(self.root, image=background_image)
         background_label.place(relwidth=1, relheight=1)
-        self.background_image = background_image  # Store reference to avoid garbage collection
+        self.background_image = background_image
 
         # Initialize frames
         self.start_frame = ttk.Frame(self.root, padding=20)
@@ -90,8 +90,8 @@ class App:
             with open(games_directory, "r") as file:
                 content = file.read()
             with_images = self.with_images_var.get()
-            # self.play_frame = GamePlayFrame(self.root, selected_game, content, with_images)
-            # self.play_frame.pack()
+            self.play_frame = GamePlayFrame(self.root, selected_game, with_images)
+            self.play_frame.pack(padx=20, pady=200)
 
     def show_start_frame(self):
         self._hide_all_frames()

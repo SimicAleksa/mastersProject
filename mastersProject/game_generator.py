@@ -9,8 +9,7 @@ def generate_game_from_prompt(prompt):
     textXfile = open('gameDSL.tx', 'r')
     grammar = textXfile.read()
     textXfile.close()
-
-    exampleGameFile = open('testGame.game', 'r')
+    exampleGameFile = open(os.path.join(os.getcwd(),"games","testGame.game","testGame.game"),'r')
     exampleGame = exampleGameFile.read()
     exampleGameFile.close()
 
@@ -40,8 +39,4 @@ def generate_game_from_prompt(prompt):
     # Extract the generated game description
     game_description = response.choices[0].message.content
 
-    # Save this to a file
-    with open("generatedGame.game", "w") as file:
-        file.write(game_description)
-
-    return "generatedGame.game"
+    return game_description

@@ -2,6 +2,8 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 import os
 
+from mastersProject.game_generator import generate_game_from_prompt
+
 
 class GptCreatorFrame(ttk.Frame):
     def __init__(self, parent):
@@ -41,7 +43,8 @@ class GptCreatorFrame(ttk.Frame):
                 game_file_path = os.path.join(game_folder_path, f"{game_name}.game")
 
                 with open(game_file_path, "w") as game_file:
-                    game_file.write(prompt)
+                    game_text = generate_game_from_prompt(prompt)
+                    game_file.write(game_text)
 
                 print(f"Game '{game_name}' has been created successfully with the provided prompt.")
                 messagebox.showinfo("Success", f"Game '{game_name}' has been created.")

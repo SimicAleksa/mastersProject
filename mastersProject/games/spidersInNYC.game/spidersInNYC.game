@@ -1,0 +1,174 @@
+region central_park {
+    portrayal "Central Park overrun by giant webs."
+    contains map, energy_bar
+    ::
+    N -> fifth_ave,
+    S -> times_square
+    ::
+}
+
+region fifth_ave {
+    portrayal "A web-covered Fifth Avenue teeming with spiders."
+    contains backpack
+    ::
+    S -> central_park,
+    W -> madison_ave
+    ::
+    environmental_dmg damage 20
+}
+
+region times_square {
+    portrayal "A chaotic Times Square with spiders swarming!"
+    ::
+    N -> central_park,
+    S -> subway_entrance
+    ::
+    requirements map
+}
+
+region madison_ave {
+    portrayal "Madison Avenue with abandoned storefronts."
+    contains power_glove
+    ::
+    E -> fifth_ave,
+    N -> empire_state_building
+    ::
+}
+
+region subway_entrance {
+    portrayal "The entrance to an abandoned subway station."
+    ::
+    N -> times_square,
+    S -> subway_tunnel
+    ::
+}
+
+region subway_tunnel {
+    portrayal "A dark underground tunnel filled with echoes."
+    ::
+    N -> subway_entrance,
+    E -> final_spider_lair
+    ::
+}
+
+region empire_state_building {
+    portrayal "The grand Empire State Building, your final destination."
+    ::
+    S -> madison_ave
+    ::
+}
+
+region final_spider_lair {
+    portrayal "The final spider lair. You sense danger but also opportunity."
+    ::
+    S -> subway_tunnel,
+    E -> empire_state_building 
+    ::
+}
+
+item map {
+    portrayal "A crumpled map of New York City."
+    isStatic False
+}
+
+item energy_bar {
+    portrayal "A chocolate energy bar, boosts energy when eaten."
+    activation heal 50
+    isStatic False
+}
+
+item backpack {
+    portrayal "A sturdy backpack, useful for carrying items."
+    isStatic False
+}
+
+item power_glove {
+    portrayal "A futuristic glove with electrical capabilities."
+    activation restoreMana 30
+    isStatic False
+}
+
+player adventurer {
+    currentExperience 0
+    neededExperienceForLevelUp 40
+    levelScalingPercentage 70000
+    level 1
+    portrayal "You are a brave adventurer fighting to save New York City."
+    position central_park
+    inventory {
+        energy_bar, map
+    }
+    intelligence 5
+    vigor 10
+    strength 10
+    endurance 8
+
+    health 100
+    mana 50
+    damage 12
+    defence 5
+
+    canEquip {
+        sword, kinetic
+    }
+}
+
+enemy giant_spider {
+    portrayal "A colossal spider with a lethal bite."
+    position fifth_ave
+    drops {
+        map,
+        energy_bar,
+        backpack
+    }
+    health 150
+    mana 30
+    xp 70
+    attacks {
+        attack bite {
+            healthDamage 25
+            healthDamageVariance 0.1
+            frequency 0.7
+        }
+        attack web_tangle {
+            healthDamage 15
+            healthDamageVariance 0.2
+            frequency 0.3
+        }
+    }
+    healing {
+        chance 0.3
+        amount 20
+        amountVariance 0.1
+    }
+}
+
+weapon kinetic_blade {
+    portrayal "A high-tech kinetic blade."
+    type sword
+    healthDamage 15
+    requiredLevel 2
+}
+
+weapon electric_rod {
+    portrayal "An electric rod capable of delivering shocks."
+    type kinetic
+    healthDamage 20
+    manaCost 10
+    requiredLevel 3
+}
+
+armor urban_armor {
+    portrayal "An urban armor suit providing good protection."
+    type fabric
+    requiredLevel 2
+    defense 25
+}
+
+settings {
+    dropOtherWeapons True
+    additionalTurnAfterUse True
+}
+
+start_position central_park
+final_position empire_state_building

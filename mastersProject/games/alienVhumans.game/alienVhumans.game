@@ -1,0 +1,108 @@
+region earth {
+    portrayal "The serene blue planet home to humanity, now under threat from aliens."
+    contains laser_gun, health_pack, space_key
+    ::
+    N -> spaceship
+    ::
+}
+
+region spaceship {
+    portrayal "A high-tech spaceship ready to launch missiles."
+    contains missile_control_panel, alien_weapon
+    ::
+    S -> earth
+    ::
+    requirements space_key
+}
+
+region alien_ship {
+    portrayal "The alien mothership hovering over Earth, brimming with extraterrestrial technology."
+    ::
+    S -> spaceship
+    ::
+}
+
+item h_pack {
+    portrayal "A health pack that restores your health."
+    activation heal 50
+    isStatic False
+}
+
+item space_key {
+    portrayal "A key that grants access to the spaceship."
+    isStatic False
+}
+
+item laser_gun {
+    portrayal "A powerful laser gun effective against aliens."
+    activation heal 100
+    isStatic False
+}
+
+item missile_control_panel {
+    portrayal "A control panel to launch missiles against the alien ship."
+    isStatic True
+}
+
+player adventurer {
+    currentExperience 0
+    neededExperienceForLevelUp 100
+    levelScalingPercentage 50000
+    level 1
+    portrayal "An intrepid adventurer on a mission to save Earth."
+    position earth
+    inventory {
+        laser_gun, h_pack
+    }
+    intelligence 10
+    vigor 10
+    strength 15
+    endurance 10
+
+    health 100
+    mana 0
+    damage 20
+    defence 5
+
+    canEquip {
+        laser_gun, plasma_gun
+    }
+}
+
+enemy alien_soldier {
+    portrayal "A vicious alien soldier defending their ship."
+    position alien_ship
+    drops {
+        health_pack,
+        alien_weapon
+    }
+    health 80
+    xp 100
+    attacks {
+        attack laser_attack {
+            healthDamage 15
+            healthDamageVariance 0.3
+            frequency 0.5
+        }
+        attack plasma_blast {
+            healthDamage 25
+            healthDamageVariance 0.2
+            frequency 0.5
+        }
+    }
+}
+
+weapon alien_weapon {
+    portrayal "An alien weapon that disintegrates anything in seconds."
+    type plasma_gun
+    healthDamage 50
+    requiredLevel 1
+}
+
+settings {
+    dropOtherWeapons True
+    additionalTurnAfterUse False
+}
+
+start_position earth
+final_position alien_ship

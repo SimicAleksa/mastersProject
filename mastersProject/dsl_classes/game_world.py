@@ -515,7 +515,7 @@ class GameWorld:
         else:
             self.heal_enemy()
             str_to_return += self.attack_player() + "\n"
-            print(self.attack_player())
+            # print(self.attack_player())
         return str_to_return
 
     def attack_player(self):

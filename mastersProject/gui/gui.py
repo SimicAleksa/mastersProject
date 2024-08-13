@@ -106,6 +106,7 @@ class App:
 
     def show_library_frame(self):
         self._hide_all_frames()
+        self.load_games()
         self.library_frame.pack(padx=20, pady=200)
 
     def show_gpt_creation_frame(self):

@@ -11,13 +11,16 @@ from mastersProject.dsl_classes.armor import Armor
 from mastersProject.dsl_classes.actions import HealAction, RestoreManaAction
 from mastersProject.dsl_classes.general_settings import GeneralSettings
 
-def parse_dsl():
+
+def parse_dsl(dsl_path, game_path):
     # Load the metamodel from the DSL grammar
     this_folder = dirname(__file__)
-    dsl_mm = metamodel_from_file(join(this_folder, "gameDSL.tx"))
+    # dsl_mm = metamodel_from_file(join(this_folder, "gameDSL.tx"))
+    dsl_mm = metamodel_from_file(join(this_folder, dsl_path))
 
     # Parse the DSL file and create the GameWorld
-    model = dsl_mm.model_from_file(join(this_folder, "generatedGame.game"))
+    model = dsl_mm.model_from_file(join("games\\" + game_path, game_path))
+    # model = dsl_mm.model_from_file(join(this_folder, "generatedGame.game"))
     # model = dsl_mm.model_from_file(join(this_folder, "testGame.game"))
 
     game_world = GameWorld()
@@ -87,8 +90,10 @@ def parse_dsl():
         if region.name == player_def.position.name:
             initial_position = region
             break
-    player = Player(player_def.name, initial_position, player_def.vigor, player_def.endurance, player_def.strength, player_def.intelligence,
-                    player_def.health, player_def.mana, player_def.damage, player_def.defence, player_def.manaDamage, player_def.manaDefence)
+    player = Player(player_def.name, initial_position, player_def.vigor, player_def.endurance, player_def.strength,
+                    player_def.intelligence,
+                    player_def.health, player_def.mana, player_def.damage, player_def.defence, player_def.manaDamage,
+                    player_def.manaDefence)
 
     player.current_experience = player_def.currentExperience
     player.needed_experience_for_level_up = player_def.neededExperienceForLevelUp
@@ -100,7 +105,8 @@ def parse_dsl():
 
     # Create enemies
     for enemy_def in model.enemies:
-        enemy = Enemy(enemy_def.name.replace("_", " "), enemy_def.portrayal, enemy_def.position, enemy_def.health, enemy_def.mana, enemy_def.xp)
+        enemy = Enemy(enemy_def.name.replace("_", " "), enemy_def.portrayal, enemy_def.position, enemy_def.health,
+                      enemy_def.mana, enemy_def.xp)
         for attack in enemy_def.attackTypes:
             enemy.attacks.append({
                 'name': attack.name,
@@ -128,7 +134,8 @@ def parse_dsl():
 
     # Set settings
     for settings_def in model.settings:
-        settings = GeneralSettings(settings_def.dropOtherWeapons, settings_def.dropOtherArmors, settings_def.additionalTurnAfterUse)
+        settings = GeneralSettings(settings_def.dropOtherWeapons, settings_def.dropOtherArmors,
+                                   settings_def.additionalTurnAfterUse)
         game_world.settings = settings
 
     return game_world

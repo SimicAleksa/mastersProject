@@ -58,7 +58,7 @@ def process_command(command):
 
 def initial_setup():
     global game_world
-    game_world = parse_dsl()
+    game_world = parse_dsl("gameDSL.tx","mastersProject\\games\\testGame.game\\testGame.game")
     print("Enter 'help' for help")
     print(game_world.player.print_self())
 

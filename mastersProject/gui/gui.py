@@ -3,6 +3,7 @@ from tkinter import ttk, messagebox
 from PIL import Image, ImageTk
 import os
 from mastersProject.gui.codeEditorFrame import CodeEditorFrame
+from mastersProject.gui.pictureCreatorFrame import PictureCreatorFrame
 
 
 class App:
@@ -75,7 +76,7 @@ class App:
 
         self.root.mainloop()
 
-    def adjust_color_opacity(self,color, opacity):
+    def adjust_color_opacity(self, color, opacity):
         r = int(color[1:3], 16)
         g = int(color[3:5], 16)
         b = int(color[5:7], 16)
@@ -102,19 +103,19 @@ class App:
 
     def show_library_frame(self):
         self._hide_all_frames()
-        self.library_frame.pack(padx= 20,pady =200)
+        self.library_frame.pack(padx=20, pady=200)
 
     def show_picture_creator_frame(self):
         self._hide_all_frames()
         selected_game = self.games_listbox.get(tk.ACTIVE)
         if selected_game:
             games_directory = "games/" + selected_game
-            # self.picture_creator_frame = PictureCreatorFrame(self.root, games_directory, selected_game)
-            self.picture_creator_frame.pack()
+            self.picture_creator_frame = PictureCreatorFrame(self.root, games_directory, selected_game)
+            self.picture_creator_frame.pack(padx=60, pady=60)
 
     def on_game_selected(self, content=None):
         self.fiction_frame = CodeEditorFrame(self.root, content)
-        self.fiction_frame.pack(padx= 20,pady =20)
+        self.fiction_frame.pack(padx=20, pady=20)
         if content is None:
             messagebox.showinfo("Information", "Steps when saving your game:\n"
                                                "1) Create a new folder with the same name as your game (e.g., 'simplegame.game') inside the games folder.\n"

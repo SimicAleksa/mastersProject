@@ -122,6 +122,12 @@ class GameWorld:
                 enemy = self.generate_new_enemy()
                 # prilikom kreiranja samog neprijarelja se postavlja u kojoj regiji se on nalazi
 
+            print_enemy_name = ""
+            if enemy is not None:
+                print_enemy_name = enemy.name
+            else:
+                print_enemy_name = " ... actually there is no enemy in this region"
+
             prompt = f"Generate a region portrayal for a fantasy adventure game." \
                      f" Here are the previously generated regions: {[region.name for region in self.regions]}." \
                      f"And here is the name of the region you are generating the portrayal to {new_region_name}." \
@@ -130,7 +136,7 @@ class GameWorld:
                      f"So im gonna list the things the game region has and you find a way to incorporate them into the" \
                      f"region portrayal. The list is as follows: {newly_added_items_armor_weapon_names}. Also there is" \
                      f" a possibility that the region has an enemy so if the following is None, there is no enemy." \
-                     f" The name of the enemy inside this region is {enemy.name}."
+                     f" The name of the enemy inside this region is {print_enemy_name}."
 
             new_region_portrayal = self.call_chatgpt(prompt)
             new_region.set_portrayal(new_region_portrayal)
@@ -450,6 +456,7 @@ class GameWorld:
         num_new_regions = random.randint(3, 9)
         last_region = self.generate_new_regions(num_new_regions)
         print(f"You've discovered {num_new_regions} new areas, with {last_region.name} being the furthest!")
+        return f"You've discovered {num_new_regions} new areas, with {last_region.name} being the furthest!"
 
     def check_combat(self, region):
         for enemy in self.enemies:

@@ -71,6 +71,11 @@ class App:
                                                     variable=self.with_images_var)
         self.with_images_checkbox.pack(pady=10)
 
+        self.generate_infinitely_var = tk.BooleanVar()
+        self.generate_infinitely_checkbox = ttk.Checkbutton(self.library_frame, text="Generate infinitely",
+                                                    variable=self.generate_infinitely_var)
+        self.generate_infinitely_checkbox.pack(pady=10)
+
         # Load the library
         self.load_library()
 
@@ -93,7 +98,8 @@ class App:
             with open(games_directory, "r") as file:
                 content = file.read()
             with_images = self.with_images_var.get()
-            self.play_frame = GamePlayFrame(self.root, selected_game, with_images)
+            generate_infinitely = self.generate_infinitely_var.get()
+            self.play_frame = GamePlayFrame(self.root, selected_game, with_images,generate_infinitely)
             self.play_frame.pack(padx=20, pady=100)
 
     def show_start_frame(self):

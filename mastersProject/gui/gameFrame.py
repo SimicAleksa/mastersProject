@@ -15,7 +15,7 @@ help_message = "Possible commands:\n" + "\n".join(POSSIBLE_COMMANDS)
 
 
 class GamePlayFrame(ttk.Frame):
-    def __init__(self, parent, game_title, with_images):
+    def __init__(self, parent, game_title, with_images, generate_infinitely):
         super().__init__(parent)
         self.this_folder = dirname(__file__)
         try:
@@ -35,7 +35,8 @@ class GamePlayFrame(ttk.Frame):
         self.input_label.pack(pady=5)
         self.input_entry = ttk.Entry(self, width=50)
         self.input_entry.pack(pady=5)
-        self.input_entry.bind("<Return>", lambda event: self.process_user_input(event, with_images, game_title))
+        self.input_entry.bind("<Return>", lambda event: self.process_user_input(event, with_images, game_title,
+                                                                                generate_infinitely))
 
         if with_images:
             self.image_label = tk.Label(self, width=256, height=256)
@@ -43,7 +44,7 @@ class GamePlayFrame(ttk.Frame):
             self.generate_image(self.gameWorld.regions[0].name, game_title)
 
     def generate_image(self, region_name, game_title):
-        image_path = os.path.join(os.getcwd(), "games",game_title, region_name + ".png")
+        image_path = os.path.join(os.getcwd(), "games", game_title, region_name + ".png")
         if os.path.exists(image_path):
             self.img_fromPipe = Image.open(image_path)
         else:
@@ -55,8 +56,9 @@ class GamePlayFrame(ttk.Frame):
     def display_help(self):
         self.text_area.insert("end", "\n\n" + help_message + "\n\n")
 
-    def process_user_input(self, event, with_images, game_title):
+    def process_user_input(self, event, with_images, game_title, generate_infinitely):
         user_input = self.input_entry.get().strip()
+        self.text_area.insert("end", '\n' + '---------------------------------' + '\n')
         self.text_area.insert("end", '\n' + user_input)
         self.input_entry.delete(0, tk.END)
         the_end = False
@@ -67,12 +69,16 @@ class GamePlayFrame(ttk.Frame):
                 possible_move = "move " + door
                 possible_moves.remove(possible_move)
             if user_input in possible_moves:
-                self.text_area.delete("1.0", tk.END)
-                self.text_area.insert("1.0", "THE END")
-                the_end = True
-                if with_images:
-                    self.img = ImageTk.PhotoImage(file=join(self.this_folder, "resources\\theEnd.png"))
-                    self.image_label.config(image=self.img)
+                if generate_infinitely:
+                    new_discovered_areas = self.gameWorld.explore_new_area()
+                    self.text_area.insert("end", '\n' + new_discovered_areas)
+                else:
+                    self.text_area.delete("1.0", tk.END)
+                    self.text_area.insert("1.0", "THE END")
+                    the_end = True
+                    if with_images:
+                        self.img = ImageTk.PhotoImage(file=join(self.this_folder, "resources\\theEnd.png"))
+                        self.image_label.config(image=self.img)
 
         if not the_end:
             if user_input.startswith("move"):
@@ -125,7 +131,7 @@ class GamePlayFrame(ttk.Frame):
 
             elif user_input.startswith("info"):
                 item = user_input[5:]
-                text = self.gameWorld.player.print_item_info(item,self.gameWorld)
+                text = self.gameWorld.player.print_item_info(item, self.gameWorld)
                 self.text_area.insert("end", '\n' + text)
 
             elif user_input == "inventory":
@@ -161,4 +167,3 @@ class GamePlayFrame(ttk.Frame):
 
         if user_input == "help" and not the_end:
             self.display_help()
-

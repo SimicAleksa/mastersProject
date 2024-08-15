@@ -520,7 +520,7 @@ class GameWorld:
                 print(f"{self.current_enemy.name} dropped {', '.join([item.name for item in dropped_items])}")
             self.current_enemy = None
         else:
-            self.heal_enemy()
+            str_to_return += self.heal_enemy() + "\n"
             str_to_return += self.attack_player() + "\n"
             # print(self.attack_player())
         return str_to_return
@@ -566,3 +566,4 @@ class GameWorld:
             amount = int(self.current_enemy.healing_amount * uniform(healing_variance_low, healing_variance_high))
             self.current_enemy.heal(amount)
             print(f"Enemy healed by {amount}. Enemy has {self.current_enemy.get_health()} health.")
+            return f"Enemy healed by {amount}. Enemy has {self.current_enemy.get_health()} health."

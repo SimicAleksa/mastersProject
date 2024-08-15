@@ -181,6 +181,9 @@ class GamePlayFrame(ttk.Frame):
                 text = self.gameWorld.player.get_stats_string()
                 self.text_area.insert("end", '\n' + text)
 
+            elif user_input == "help":
+                pass
+
             elif user_input == "exit":
                 self.pack_forget()
 

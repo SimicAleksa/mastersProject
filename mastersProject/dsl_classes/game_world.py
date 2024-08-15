@@ -573,6 +573,7 @@ class GameWorld:
             self.current_enemy.heal(amount)
             print(f"Enemy healed by {amount}. Enemy has {self.current_enemy.get_health()} health.")
             return f"Enemy healed by {amount}. Enemy has {self.current_enemy.get_health()} health."
+        return ""
 
     def region_string_for_image_creation(self,region):
         enemy_in_region = "Actually there is no enemy present in this region"

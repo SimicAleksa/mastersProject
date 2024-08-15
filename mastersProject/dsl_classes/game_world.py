@@ -136,7 +136,8 @@ class GameWorld:
                      f"So im gonna list the things the game region has and you find a way to incorporate them into the" \
                      f"region portrayal. The list is as follows: {newly_added_items_armor_weapon_names}. Also there is" \
                      f" a possibility that the region has an enemy so if the following is None, there is no enemy." \
-                     f" The name of the enemy inside this region is {print_enemy_name}."
+                     f" The name of the enemy inside this region is {print_enemy_name}. " \
+                     f"Your response must be length 600 characters or less. So the portrayal has a maximum length of 600 characters."
 
             new_region_portrayal = self.call_chatgpt(prompt)
             new_region.set_portrayal(new_region_portrayal)
@@ -163,7 +164,8 @@ class GameWorld:
         prompt = f"Generate an enemy portrayal for a fantasy adventure game." \
                  f" The generated enemy's name that need this portrayal is: {enemy_name}." \
                  f"The enemy is placed inside the region named {self.regions[-1].name}." \
-                 f" Return just the enemy portrayal. So just the enemy portrayal and nothing more!"
+                 f" Return just the enemy portrayal. So just the enemy portrayal and nothing more!" \
+                 f"Your response must be length 600 characters or less. So the portrayal has a maximum length of 600 characters."
 
         enemy_portrayal = self.call_chatgpt(prompt)
 
@@ -277,7 +279,8 @@ class GameWorld:
                  f"item cannot be activated, instead it can be possibly used to open some door somewhere!" \
                  f"Once again if the action is not HealAction or RestoreManaAction but instead its just None the item" \
                  f"can not be activated EVER!" \
-                 f" Return just the item portrayal. So just the item portrayal and nothing more!"
+                 f" Return just the item portrayal. So just the item portrayal and nothing more!" \
+                 f"Your response must be length 600 characters or less. So the portrayal has a maximum length of 600 characters."
 
         new_item_portrayal = self.call_chatgpt(prompt)
 
@@ -330,7 +333,8 @@ class GameWorld:
                  f"item cannot be activated, instead it can be possibly used to open some door somewhere!" \
                  f"Once again if the action is not HealAction or RestoreManaAction but instead its just None the item" \
                  f"can not be activated EVER!" \
-                 f" Return just the item portrayal. So just the item portrayal and nothing more!"
+                 f" Return just the item portrayal. So just the item portrayal and nothing more!" \
+                 f"Your response must be length 600 characters or less. So the portrayal has a maximum length of 600 characters."
 
         new_inner_item_portrayal = self.call_chatgpt(prompt)
 
@@ -378,7 +382,8 @@ class GameWorld:
                  f" The weapon you are creating this portrayal has the following attributes:" \
                  f"health_damage = {health_damage}; mana_damage = {mana_damage} ; health_cost = {health_cost};" \
                  f" mana_cost = {mana_cost}; weaponType = {weaponType}" \
-                 f" Return just the item portrayal. So just the item portrayal and nothing more!"
+                 f" Return just the item portrayal. So just the item portrayal and nothing more!" \
+                 f"Your response must be length 600 characters or less. So the portrayal has a maximum length of 600 characters."
 
         weapon_portrayal = self.call_chatgpt(prompt)
 
@@ -431,7 +436,8 @@ class GameWorld:
                  f" negation that lowers enemy's magic strength (player takes less magic damage) " \
                  f" The armor you are creating this portrayal has the following attributes:" \
                  f"defense = {defense}; mana_defense = {mana_defense} " \
-                 f" Return just the item portrayal. So just the item portrayal and nothing more!"
+                 f" Return just the item portrayal. So just the item portrayal and nothing more!" \
+                 f"Your response must be length 600 characters or less. So the portrayal has a maximum length of 600 characters."
 
         armor_portrayal = self.call_chatgpt(prompt)
 
@@ -567,3 +573,10 @@ class GameWorld:
             self.current_enemy.heal(amount)
             print(f"Enemy healed by {amount}. Enemy has {self.current_enemy.get_health()} health.")
             return f"Enemy healed by {amount}. Enemy has {self.current_enemy.get_health()} health."
+
+    def region_string_for_image_creation(self,region):
+        enemy_in_region = "Actually there is no enemy present in this region"
+        for enemy in self.enemies:
+            if enemy.position.name == region.name:
+                enemy_in_region = enemy.name
+        return region.print_self() + f"Also inside {region.name} you see the enemy named...{enemy_in_region}"

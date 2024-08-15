@@ -1,14 +1,16 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-
+import requests
 from mastersProject.enums_consts import POSSIBLE_COMMANDS
 from mastersProject.interpreter import parse_dsl
 from PIL import ImageTk
 from PIL import Image
-
+from io import BytesIO
 from os.path import join, dirname
-
+from openai import OpenAI
 import os
+
+client = OpenAI(api_key=os.environ.get("OPENAI_KEY"))
 
 # Help command message
 help_message = "Possible commands:\n" + "\n".join(POSSIBLE_COMMANDS)
@@ -41,17 +43,37 @@ class GamePlayFrame(ttk.Frame):
         if with_images:
             self.image_label = tk.Label(self, width=256, height=256)
             self.image_label.pack()
-            self.generate_image(self.gameWorld.regions[0].name, game_title)
+            self.generate_image(self.gameWorld.regions[0], game_title, generate_infinitely)
 
-    def generate_image(self, region_name, game_title):
+    def generate_image(self, region, game_title, generate_infinitely):
+        region_name = region.name
         image_path = os.path.join(os.getcwd(), "games", game_title, region_name + ".png")
         if os.path.exists(image_path):
             self.img_fromPipe = Image.open(image_path)
         else:
-            self.img_fromPipe = Image.open(join(self.this_folder, "resources\\noImage.png"))
+            if generate_infinitely:
+                self.img_fromPipe = self.infinitely_generate_pictures(region, game_title)
+            else:
+                self.img_fromPipe = Image.open(join(self.this_folder, "resources\\noImage.png"))
+
         self.img = self.img_fromPipe.resize((256, 256))
         self.img = ImageTk.PhotoImage(self.img)
         self.image_label.config(image=self.img)
+
+    def infinitely_generate_pictures(self, region, game_title):
+        prompt = self.gameWorld.region_string_for_image_creation(region)
+
+        response = client.images.generate(
+            model="dall-e-2",
+            prompt=prompt,
+            size="256x256",
+            n=1,
+        )
+        games_directory = "games/" + game_title
+        generated_image = Image.open(BytesIO(requests.get(response.data[0].url).content))
+        generated_image.save(games_directory + '/' + region.name + '.png')
+
+        return generated_image
 
     def display_help(self):
         self.text_area.insert("end", "\n\n" + help_message + "\n\n")
@@ -91,7 +113,7 @@ class GamePlayFrame(ttk.Frame):
                     self.text_area.insert("end", '\n' + text)
                     self.text_area.insert("end", '\n' + self.gameWorld.player.print_self())
                     if with_images and moved:
-                        self.generate_image(self.gameWorld.player.position.name, game_title)
+                        self.generate_image(self.gameWorld.player.position, game_title, generate_infinitely)
 
             elif user_input.startswith("take"):
                 item = user_input[5:]

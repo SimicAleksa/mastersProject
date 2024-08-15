@@ -71,7 +71,7 @@ class GamePlayFrame(ttk.Frame):
                 self.text_area.insert("1.0", "THE END")
                 the_end = True
                 if with_images:
-                    self.img = ImageTk.PhotoImage(file=join(self.this_folder, "theEnd.png"))
+                    self.img = ImageTk.PhotoImage(file=join(self.this_folder, "resources\\theEnd.png"))
                     self.image_label.config(image=self.img)
 
         if not the_end:

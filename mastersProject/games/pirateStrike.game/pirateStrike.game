@@ -1,0 +1,151 @@
+region small_island {
+    portrayal "A small peaceful island turned into a battleground."
+    contains coconut, map, machete
+    ::
+    N -> dense_forest
+    ::
+}
+
+region dense_forest {
+    portrayal "A dense forest, hiding unpredictable dangers."
+    contains potion
+    ::
+    N -> abandoned_hut,
+    S -> small_island
+    ::
+    environmental_dmg damage 10
+}
+
+region abandoned_hut {
+    portrayal "An abandoned hut that whispers the tales of past inhabitants."
+    contains telescope
+    ::
+    N -> pirate_ship,
+    S -> dense_forest
+    ::
+    requirements map
+}
+
+region pirate_ship {
+    portrayal "The pirate ship, the stronghold of the marauding crew."
+    ::
+    N -> pirate_ship_deck,
+    S -> abandoned_hut
+    ::
+}
+
+region pirate_ship_deck {
+    portrayal "The pirate ship deck, where the final battle awaits."
+    ::
+    S -> pirate_ship
+    ::
+}
+
+item coconut {
+    portrayal "A nutritious coconut, it restores health."
+    activation heal 10
+    isStatic False
+}
+
+item map {
+    portrayal "A map showing the way through the dense forest."
+    isStatic False
+}
+
+item potion {
+    portrayal "A potion that lights up the darkest paths."
+    activation restoreMana 10
+    isStatic False
+}
+
+item telescope {
+    portrayal "A telescope to spot enemy movements from afar."
+    isStatic False
+}
+
+player survivor {
+    currentExperience 0
+    neededExperienceForLevelUp 50
+    levelScalingPercentage 20
+    level 1
+    portrayal "You are a courageous survivor defending your island."
+    position small_island
+    inventory {
+        coconut
+    }
+    intelligence 5
+    vigor 15
+    strength 12
+    endurance 13
+
+    health 100
+    mana 50
+    damage 12
+    defence 8
+
+    canEquip {
+        sword,wood
+    }
+}
+
+enemy pirate_captain {
+    portrayal "The ruthless pirate captain directing the attacks."
+    position pirate_ship_deck
+    drops {
+        machete,
+        shield
+    }
+    health 80
+    mana 30
+    xp 100
+    attacks {
+        attack cutlass_slash {
+            healthDamage 15
+            healthDamageVariance 0.15
+            frequency 0.5
+        }
+        attack pistol_shot {
+            healthDamage 20
+            healthDamageVariance 0.1
+            frequency 0.3
+        }
+    }
+    healing {
+        chance 0.3
+        amount 5
+        amountVariance 0.1
+    }
+}
+
+weapon machete {
+    portrayal "A sharp machete perfect for close combat."
+    type sword
+    healthDamage 15
+    modifiers {
+        modifier {
+            modifies damage
+            coefficients 0.3,2
+        }
+    }
+}
+
+weapon cutlass {
+    portrayal "A pirate's cutlass, designed to strike with precision."
+    type sword
+    healthDamage 12
+}
+
+armor shield {
+    portrayal "A wooden shield for protection against enemy attacks."
+    type wood
+    requiredLevel 1
+    defense 20
+}
+
+settings {
+    dropOtherWeapons True
+    additionalTurnAfterUse False
+}
+
+start_position small_island
+final_position pirate_ship_deck

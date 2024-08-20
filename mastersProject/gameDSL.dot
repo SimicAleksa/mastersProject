@@ -1,0 +1,116 @@
+
+    digraph textX {
+    fontname = "Bitstream Vera Sans"
+    fontsize = 8
+    node[
+        shape=record,
+        style=filled,
+        fillcolor=aliceblue
+    ]
+    nodesep = 0.3
+    edge[dir=black,arrowtail=empty]
+
+
+2177721833872[ label="{GameWorld|}"]
+
+2177721854640[ label="{GeneralSettings|dropOtherWeapons: BOOL\ldropOtherArmors: BOOL\ladditionalTurnAfterUse: BOOL\l}"]
+
+2177721852752[ label="{Region|name: GWID\lportrayal: STRING\l}"]
+
+2177721847088[ label="{Enemy|name: GWID\lportrayal: STRING\lhealth: INT\lmana: INT\lxp: INT\lhealingChance: FLOAT\lhealingAmount: INT\lhealingAmountVariance: FLOAT\l}"]
+
+2177721865968[ label="{AttackType|name: GWID\lhealthDamage: INT\lhealthDamageVariance: FLOAT\lmanaDamage: INT\lmanaDamageVariance: FLOAT\lhealthCost: INT\lmanaCost: INT\lfrequency: FLOAT\l}"]
+
+2177721850864[ label="{Requirement|item: GWID\l}"]
+
+2177721861248[ label="{Player|name: GWID\lportrayal: STRING\lcurrentExperience: INT\lneededExperienceForLevelUp: INT\llevelScalingPercentage: INT\llevel: INT\lvigor: INT\lendurance: INT\lstrength: INT\lintelligence: INT\lhealth: INT\lmana: INT\ldamage: INT\ldefence: INT\lmanaDamage: INT\lmanaDefence: INT\lcanEquip: optional\<list[GWID]\>\l}"]
+
+2177721858416[ label="{Weapon|name: GWID\lportrayal: STRING\ltype: GWID\lhealthDamage: INT\lmanaDamage: INT\lhealthCost: INT\lmanaCost: INT\lrequiredLevel: INT\l}"]
+
+2177721841424[ label="{Armor|name: GWID\lportrayal: STRING\ltype: GWID\ldefense: INT\lmanaDefense: INT\lrequiredLevel: INT\l}"]
+
+2177721868800[ label="{Modifier|modifiableAttribute: Modifiable\lcoefficients: list[FLOAT]\l}"]
+
+2177721860304[ label="{Item|name: GWID\lportrayal: STRING\lisStatic: BOOL\l}"]
+
+2177721862192[ label="{Connection|direction: Direction\ltarget: GWID\l}"]
+
+2177721843312[ label="{*Containable|}"]
+
+2177721840480[ label="{ActivationProperties|}"]
+
+2177721864080[ label="{*ActivationAction|}"]
+
+2177721866912[ label="{RestoreHealthAction|amount: INT\l}"]
+
+2177721890512[ label="{RestoreManaAction|amount: INT\l}"]
+
+2177721891456[ label="{EnvironmentalDamage|amount: INT\l}"]
+
+2177721897120[ label="{*MovementProperties|}"]
+
+2177721882016[ label="{MoveCommand|direction: Direction\l}"]
+
+2177721895232[ label="{OpenCommand|object: GWID\l}"]
+
+2177721872576[ label="{TakeCommand|object: GWID\l}"]
+
+2177721894288[ label="{DropCommand|object: GWID\l}"]
+
+2177721886736[ label="{UseCommand|object: GWID\l}"]
+
+
+
+2177721833872 -> 2177721852752[arrowtail=diamond, dir=both, headlabel="regions 1..*"]
+2177721833872 -> 2177721860304[arrowtail=diamond, dir=both, headlabel="items 1..*"]
+2177721833872 -> 2177721861248[arrowtail=diamond, dir=both, headlabel="player "]
+2177721833872 -> 2177721847088[arrowtail=diamond, dir=both, headlabel="enemies 1..*"]
+2177721833872 -> 2177721858416[arrowtail=diamond, dir=both, headlabel="weapons 1..*"]
+2177721833872 -> 2177721841424[arrowtail=diamond, dir=both, headlabel="armors 0..*"]
+2177721833872 -> 2177721854640[arrowtail=diamond, dir=both, headlabel="settings 1..*"]
+2177721833872 -> 2177721852752[headlabel="start_position "]
+2177721833872 -> 2177721852752[headlabel="final_position "]
+2177721852752 -> 2177721843312[headlabel="contains 0..*"]
+2177721852752 -> 2177721862192[arrowtail=diamond, dir=both, headlabel="connections 0..*"]
+2177721852752 -> 2177721850864[arrowtail=diamond, dir=both, headlabel="requirements 1..*"]
+2177721852752 -> 2177721891456[arrowtail=diamond, dir=both, headlabel="environmental_dmg "]
+2177721847088 -> 2177721852752[headlabel="position "]
+2177721847088 -> 2177721843312[headlabel="inventory 0..*"]
+2177721847088 -> 2177721865968[arrowtail=diamond, dir=both, headlabel="attackTypes 1..*"]
+2177721861248 -> 2177721852752[headlabel="position "]
+2177721861248 -> 2177721843312[headlabel="inventory 0..*"]
+2177721858416 -> 2177721868800[arrowtail=diamond, dir=both, headlabel="modifiers 0..*"]
+2177721841424 -> 2177721868800[arrowtail=diamond, dir=both, headlabel="modifiers 0..*"]
+2177721860304 -> 2177721840480[arrowtail=diamond, dir=both, headlabel="activations 0..*"]
+2177721860304 -> 2177721843312[headlabel="contains 0..*"]
+2177721843312 -> 2177721860304 [dir=back]
+2177721843312 -> 2177721858416 [dir=back]
+2177721843312 -> 2177721841424 [dir=back]
+2177721840480 -> 2177721864080[arrowtail=diamond, dir=both, headlabel="action "]
+2177721864080 -> 2177721866912 [dir=back]
+2177721864080 -> 2177721890512 [dir=back]
+2177721897120 -> 2177721882016 [dir=back]
+2177721897120 -> 2177721895232 [dir=back]
+2177721897120 -> 2177721872576 [dir=back]
+2177721897120 -> 2177721894288 [dir=back]
+2177721897120 -> 2177721886736 [dir=back]
+match_rules [ shape=plaintext, label=< <table>
+	<tr>
+		<td><b>Comment</b></td><td>\/\*(.|\n)*?\*\/</td>
+	</tr>
+	<tr>
+		<td><b>Direction</b></td><td>N|S|E|W</td>
+	</tr>
+	<tr>
+		<td><b>GWID</b></td><td>Not(Keyword) ID</td>
+	</tr>
+	<tr>
+		<td><b>Keyword</b></td><td>start_position|final_position|drop|take|open|move|N|S|E|W|portrayal|position|heal|health|contains|inventory|isStatic|requirements|damage|environmental_dmg|xp|vigor|endurance|strength|currentExperience|neededExperienceForLevelUp|dropsWeapon|level|region|item|player|enemy|weapon|use|restoreMana|activation|current_max_health|current_max_mana|defence|mana_damage|mana_defence|coefficients|modifies|modifier {|modifiers|requiredLevel|manaDefense|defense|type|armor|healthDamage|manaDamage|healthCost|manaCost|attack|healthDamageVariance|manaDamageVariance|frequency|levelScalingPercentage|intelligence|mana|manaDefence|canEquip|settings|dropOtherWeapons|dropOtherArmors|additionalTurnAfterUse|drops|attacks|healing|chance|amount|amountVariance</td>
+	</tr>
+	<tr>
+		<td><b>Modifiable</b></td><td>current_max_health|current_max_mana|damage|defence|mana_damage|mana_defence</td>
+	</tr>
+</table> >]
+
+
+}

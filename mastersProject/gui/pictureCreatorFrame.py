@@ -18,8 +18,8 @@ class PictureCreatorFrame(ttk.Frame):
         self.default_img = Image.open(os.path.join(os.getcwd(), "gui\\resources\\noImage.png"))
         try:
             self.gameWorld = parse_dsl("gameDSL.tx", selected_game)
-        except:
-            messagebox.showinfo("Information", "Game code is invalid. You need to verify it.")
+        except Exception as e:
+            messagebox.showinfo("Error", e.message + f", on line {e.col}")
             return
 
         self.counter = -1

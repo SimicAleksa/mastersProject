@@ -51,8 +51,8 @@ class GamePlayFrame(ttk.Frame):
         else:
             try:
                 self.gameWorld = parse_dsl("gameDSL.tx", game_title)
-            except:
-                messagebox.showinfo("Information", "Game code is invalid. You need to verify it.")
+            except Exception as e:
+                messagebox.showinfo("Error", e.message + f", on line {e.col}")
                 return
 
         frame_title_label = ttk.Label(self, text=game_title[:-5], font=("Arial", 14, "bold"))

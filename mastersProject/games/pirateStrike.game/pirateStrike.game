@@ -4,6 +4,8 @@ region small_island {
     ::
     N -> dense_forest
     ::
+    environmental_dmg damage 10
+    requirements map
 }
 
 region dense_forest {

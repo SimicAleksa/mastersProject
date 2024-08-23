@@ -1,6 +1,8 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 import requests
+
+from mastersProject.dsl_classes.game_world import GameWorld
 from mastersProject.enums_consts import POSSIBLE_COMMANDS
 from mastersProject.interpreter import parse_dsl
 from PIL import ImageTk
@@ -8,6 +10,8 @@ from PIL import Image
 from io import BytesIO
 from os.path import join, dirname
 from openai import OpenAI
+from functools import partial
+import dill as pickle
 import os
 
 client = OpenAI(api_key=os.environ.get("OPENAI_KEY"))
@@ -17,11 +21,31 @@ help_message = "Possible commands:\n" + "\n".join(POSSIBLE_COMMANDS)
 
 
 class GamePlayFrame(ttk.Frame):
-    def __init__(self, parent, game_title, with_images, generate_infinitely):
+    def __init__(self, parent, game_title, with_images, generate_infinitely, reload_saved_file):
         super().__init__(parent)
         self.this_folder = dirname(__file__)
         try:
-            self.gameWorld = parse_dsl("gameDSL.tx", game_title)
+            if reload_saved_file:
+                with open(game_title + ".pickle", 'rb') as file:
+                    game_state = pickle.load(file)
+
+                game_world = GameWorld()
+                game_world.regions = game_state['regions']
+                game_world.items = game_state['items']
+                game_world.enemies = game_state['enemies']
+                game_world.weapons = game_state['weapons']
+                game_world.armors = game_state['armors']
+                game_world.player = game_state['player']
+                game_world.start_position = game_state['start_position']
+                game_world.final_position = game_state['final_position']
+                game_world.settings = game_state['settings']
+                game_world.current_enemy = game_state['current_enemy']
+                game_world.prev_direction = game_state['prev_direction']
+                game_world.opposite_dirs = game_state['opposite_dirs']
+
+                self.gameWorld = game_world
+            else:
+                self.gameWorld = parse_dsl("gameDSL.tx", game_title)
         except:
             messagebox.showinfo("Information", "Game code is invalid. You need to verify it.")
             return
@@ -44,6 +68,28 @@ class GamePlayFrame(ttk.Frame):
             self.image_label = tk.Label(self, width=256, height=256)
             self.image_label.pack()
             self.generate_image(self.gameWorld.regions[0], game_title, generate_infinitely)
+
+        self.save_button = tk.Button(self, text="Save",
+                                     command=partial(self.save_game_state, game_title, self.gameWorld))
+        self.save_button.pack(padx=5, pady=5)
+
+    def save_game_state(self, game_title, game_world):
+        game_state = {
+            'regions': game_world.regions,
+            'items': game_world.items,
+            'enemies': game_world.enemies,
+            'weapons': game_world.weapons,
+            'armors': game_world.armors,
+            'player': game_world.player,
+            'start_position': game_world.start_position,
+            'final_position': game_world.final_position,
+            'current_enemy': game_world.current_enemy,
+            'prev_direction': game_world.prev_direction,
+            'opposite_dirs': game_world.opposite_dirs,
+            'settings': game_world.settings,
+        }
+        with open(game_title + ".pickle", 'wb') as file:
+            pickle.dump(game_state, file)
 
     def generate_image(self, region, game_title, generate_infinitely):
         region_name = region.name

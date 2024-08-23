@@ -49,6 +49,13 @@ class Player:
         self.strength = strength
         self.intelligence = intelligence
 
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+
     def remove_item(self, item):
         del self.position.items[item]
 
@@ -220,10 +227,10 @@ class Player:
         self.position = region
         text = f"{self.name} moved to {self.position.name}."
         if region.environmental_dmg:
-            environmental_dmg = region.environmental_dmg.amount - self.endurance
+            environmental_dmg = region.environmental_dmg - self.endurance
             environmental_dmg = 0 if environmental_dmg < 0 else environmental_dmg
             self.health -= environmental_dmg
-            if region.environmental_dmg.amount != 0:
+            if region.environmental_dmg != 0:
                 text += f"\nYou took {environmental_dmg} environmental damage"
                 text += f"\nYou now have {self.health} health"
         if game_world.check_combat(region):
@@ -462,7 +469,7 @@ def _check_if_the_requirements_are_met(region_requirements, player_inventory):
     for region_req in region_requirements:
         req_met = False
         for player_item in player_inventory:
-            if player_item == region_req.item:
+            if player_item == region_req:
                 req_met = True
                 break
         if not req_met:
@@ -475,7 +482,7 @@ def _remove_met_region_requirements_from_player_inventory(region_requirements, p
     for player_item in player_inventory:
         needed_req = False
         for region_req in region_requirements:
-            if player_item == region_req.item:
+            if player_item == region_req:
                 needed_req = True
                 break
         if not needed_req:

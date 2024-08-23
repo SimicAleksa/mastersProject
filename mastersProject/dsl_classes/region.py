@@ -7,6 +7,13 @@ class Region:
         self.requirements = []
         self.environmental_dmg = None
 
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+
     def set_portrayal(self, portrayal):
         self.portrayal = portrayal
 

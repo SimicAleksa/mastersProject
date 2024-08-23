@@ -20,6 +20,13 @@ class Enemy:
         self.healing_amount = 0
         self.healing_amount_variance = 0
 
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+
     def get_xp_value(self):
         return self.xp
 

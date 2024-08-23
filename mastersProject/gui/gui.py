@@ -76,6 +76,11 @@ class App:
                                                     variable=self.generate_infinitely_var)
         self.generate_infinitely_checkbox.pack(pady=10)
 
+        self.reload_previous_game = tk.BooleanVar()
+        self.reload_previous_game_checkbox = ttk.Checkbutton(self.library_frame, text="Reload saved game",
+                                                    variable=self.reload_previous_game)
+        self.reload_previous_game_checkbox.pack(pady=10)
+
         # Load the library
         self.load_library()
 
@@ -99,7 +104,8 @@ class App:
                 content = file.read()
             with_images = self.with_images_var.get()
             generate_infinitely = self.generate_infinitely_var.get()
-            self.play_frame = GamePlayFrame(self.root, selected_game, with_images,generate_infinitely)
+            reload_saved_file = self.reload_previous_game.get()
+            self.play_frame = GamePlayFrame(self.root, selected_game, with_images,generate_infinitely,reload_saved_file)
             self.play_frame.pack(padx=20, pady=100)
 
     def show_start_frame(self):

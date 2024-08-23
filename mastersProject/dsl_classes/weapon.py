@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class Weapon:
     def __init__(self, name, portrayal, weaponType, health_damage, mana_damage, health_cost, mana_cost, required_level):
         self.name = name
@@ -11,6 +12,13 @@ class Weapon:
         self.mana_cost = mana_cost
         self.required_level = required_level
         self.modifiers = {}
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
 
     def add_modifier(self, attr_name, coefficients):
         self.modifiers[attr_name] = coefficients

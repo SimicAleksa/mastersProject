@@ -11,6 +11,13 @@ class Armor:
         self.required_level = required_level
         self.modifiers = {}
 
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+
     def add_modifier(self, attr_name, coefficients):
         self.modifiers[attr_name] = coefficients
 

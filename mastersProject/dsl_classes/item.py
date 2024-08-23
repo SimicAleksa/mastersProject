@@ -6,6 +6,13 @@ class Item:
         self.activations = []
         self.isStatic = is_static
 
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+
     def print_self(self):
         return f'{self.portrayal}'
 

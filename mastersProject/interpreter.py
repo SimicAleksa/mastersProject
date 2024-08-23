@@ -31,17 +31,64 @@ def parse_dsl(dsl_path, game_path):
         for connection in region_def.connections:
             region.add_connection(connection.direction, connection.target)
         for requirement in region_def.requirements:
-            region.add_requirements(requirement)
+            region.add_requirements(requirement.item)
         if region_def.environmental_dmg:
-            region.add_environmental_dmg(region_def.environmental_dmg)
+            region.add_environmental_dmg(region_def.environmental_dmg.amount)
         for item in region_def.contains:
-            region.add_item(item)
+            temp_item = item
+            if type(item)._tx_fqn == 'gameDSL.Item':
+                temp_activations = []
+                item_to_save = Item(item.name, item.portrayal, item.isStatic)
+                for activation in item.activations:
+                    action_name = activation.action.__class__.__name__
+                    if action_name == "RestoreHealthAction":
+                        temp_activations.append(HealAction(activation.action.amount))
+                    elif action_name == "RestoreManaAction":
+                        temp_activations.append(RestoreManaAction(activation.action.amount))
+                item_to_save.activations = temp_activations
+                temp_item = item_to_save
+            elif type(item)._tx_fqn == 'gameDSL.Weapon':
+                corrected_modefiers = []
+                weapon_to_save = Weapon(
+                        item.name,
+                        item.portrayal,
+                        item.type,
+                        item.healthDamage,
+                        item.manaDamage,
+                        item.healthCost,
+                        item.manaCost,
+                        item.requiredLevel
+                    )
+                for modefier in item.modifiers:
+                    corrected_modefiers.append({'coefficients': modefier.coefficients,
+                                                'modifiableAttribute': modefier.modifiableAttribute})
+                weapon_to_save.modifiers = corrected_modefiers
+                temp_item = weapon_to_save
+
+            elif type(item)._tx_fqn == 'gameDSL.Armor':
+                corrected_modefiers = []
+                armor_to_save = Armor(
+                        item.name,
+                        item.portrayal,
+                        item.type,
+                        item.defense,
+                        item.manaDefense,
+                        item.requiredLevel
+                    )
+                for modefier in item.modifiers:
+                    corrected_modefiers.append({'coefficients': modefier.coefficients,
+                                                'modifiableAttribute': modefier.modifiableAttribute})
+                armor_to_save.modifiers = corrected_modefiers
+                temp_item = armor_to_save
+
+            region.add_item(temp_item)
         game_world.regions.append(region)
 
     # Create items
     for item_def in model.items:
         item = Item(item_def.name, item_def.portrayal, item_def.isStatic)
         item.contains = [item.name for item in item_def.contains]
+        item.activations = []
         for activation in item_def.activations:
             action_name = activation.action.__class__.__name__
             if action_name == "RestoreHealthAction":
@@ -105,7 +152,12 @@ def parse_dsl(dsl_path, game_path):
 
     # Create enemies
     for enemy_def in model.enemies:
-        enemy = Enemy(enemy_def.name.replace("_", " "), enemy_def.portrayal, enemy_def.position, enemy_def.health,
+        enemy_initial_position = None
+        for region in game_world.regions:
+            if region.name == enemy_def.position.name:
+                enemy_initial_position = region
+
+        enemy = Enemy(enemy_def.name.replace("_", " "), enemy_def.portrayal, enemy_initial_position, enemy_def.health,
                       enemy_def.mana, enemy_def.xp)
         for attack in enemy_def.attackTypes:
             enemy.attacks.append({
@@ -122,6 +174,53 @@ def parse_dsl(dsl_path, game_path):
         enemy.healing_amount = enemy_def.healingAmount
         enemy.healing_amount_variance = enemy_def.healingAmountVariance
         for item in enemy_def.inventory:
+            try:
+                if type(item)._tx_fqn == 'gameDSL.Item':
+                    temp_activations = []
+                    item_to_save = Item(item.name, item.portrayal, item.isStatic)
+                    for activation in item.activations:
+                        action_name = activation.action.__class__.__name__
+                        if action_name == "RestoreHealthAction":
+                            temp_activations.append(HealAction(activation.action.amount))
+                        elif action_name == "RestoreManaAction":
+                            temp_activations.append(RestoreManaAction(activation.action.amount))
+                    item_to_save.activations = temp_activations
+                    item = item_to_save
+                elif type(item)._tx_fqn == 'gameDSL.Weapon':
+                    corrected_modefiers = []
+                    weapon_to_save = Weapon(
+                        item.name,
+                        item.portrayal,
+                        item.type,
+                        item.healthDamage,
+                        item.manaDamage,
+                        item.healthCost,
+                        item.manaCost,
+                        item.requiredLevel
+                    )
+                    for modefier in item.modifiers:
+                        corrected_modefiers.append({'coefficients': modefier.coefficients,
+                                                    'modifiableAttribute': modefier.modifiableAttribute})
+                    weapon_to_save.modifiers = corrected_modefiers
+                    item = weapon_to_save
+
+                elif type(item)._tx_fqn == 'gameDSL.Armor':
+                    corrected_modefiers = []
+                    armor_to_save = Armor(
+                        item.name,
+                        item.portrayal,
+                        item.type,
+                        item.defense,
+                        item.manaDefense,
+                        item.requiredLevel
+                    )
+                    for modefier in item.modifiers:
+                        corrected_modefiers.append({'coefficients': modefier.coefficients,
+                                                    'modifiableAttribute': modefier.modifiableAttribute})
+                    armor_to_save.modifiers = corrected_modefiers
+                    item = armor_to_save
+            except:
+                pass
             enemy.items_to_drop[item.name] = item
         game_world.enemies.append(enemy)
 

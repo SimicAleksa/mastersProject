@@ -24,8 +24,8 @@ class GamePlayFrame(ttk.Frame):
     def __init__(self, parent, game_title, with_images, generate_infinitely, reload_saved_file):
         super().__init__(parent)
         self.this_folder = dirname(__file__)
-        try:
-            if reload_saved_file:
+        if reload_saved_file:
+            try:
                 with open(game_title + ".pickle", 'rb') as file:
                     game_state = pickle.load(file)
 
@@ -44,11 +44,16 @@ class GamePlayFrame(ttk.Frame):
                 game_world.opposite_dirs = game_state['opposite_dirs']
 
                 self.gameWorld = game_world
-            else:
+            except:
+                messagebox.showinfo("Information", "Selected game does not have a saved file. You can not select to "
+                                                   "reload it.")
+                return
+        else:
+            try:
                 self.gameWorld = parse_dsl("gameDSL.tx", game_title)
-        except:
-            messagebox.showinfo("Information", "Game code is invalid. You need to verify it.")
-            return
+            except:
+                messagebox.showinfo("Information", "Game code is invalid. You need to verify it.")
+                return
 
         frame_title_label = ttk.Label(self, text=game_title[:-5], font=("Arial", 14, "bold"))
         frame_title_label.pack(pady=10)
@@ -90,6 +95,8 @@ class GamePlayFrame(ttk.Frame):
         }
         with open(game_title + ".pickle", 'wb') as file:
             pickle.dump(game_state, file)
+
+        messagebox.showinfo("Information", "Game state saved!!")
 
     def generate_image(self, region, game_title, generate_infinitely):
         region_name = region.name

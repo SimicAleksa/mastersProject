@@ -48,6 +48,6 @@ class Region:
     def print_requirements(self):
         reqs = ""
         for req in self.requirements:
-            reqs += str(req.item) + ", "
+            reqs += str(req) + ", "
         reqs = reqs[:-2]
         return reqs

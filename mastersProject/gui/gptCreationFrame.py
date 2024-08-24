@@ -48,7 +48,8 @@ class GptCreatorFrame(ttk.Frame):
 
                 print(f"Game '{game_name}' has been created successfully with the provided prompt. Check library"
                       f" and game code for further corrections")
-                messagebox.showinfo("Success", f"Game '{game_name}' has been created.")
+                messagebox.showinfo("Success", f"Game '{game_name}' has been created successfully with the provided prompt. Check library"
+                      f" and game code for further corrections")
 
                 self.prompt_text.delete("1.0", tk.END)
                 self.name_text.delete(0, tk.END)
